@@ -1,0 +1,62 @@
+.rmsc {
+  --rmsc-main: "black";
+  --rmsc-hover: "red";
+  --rmsc-selected: #0f172a;
+  --rmsc-border: null;
+  --rmsc-gray: rgb(59 130 246 / 50%);
+  --rmsc-bg: #1f1e49;
+  --rmsc-p: 9px; /* Spacing */
+  --rmsc-radius: 7px; /* Radius */
+  --rmsc-h: 38px; /* Height */
+  !important: ;outline: none;
+
+}
+
+.rmsc .clear-selected-button {
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    accent-color: darkred;
+    display: flex;
+}
+.rmsc .dropdown-content{
+  accent-color: transparent;
+}
+.rmsc .dropdown-content [type="checkbox"]{
+  -webkit-appearance: none;
+  appearance: none;
+}
+.custom-input {
+  @apply border border-cyan-800 shadow-2xl brightness-150 px-1 mt-4 flex text-center justify-center text-indigo-600;
+  @apply py-1.5 rounded-full bg-slate-900 ;
+}
+
+.custom-input:focus {
+  outline: none;
+  border: 1px solid #0c8af8;
+  @apply bg-blue-800 text-gray-900 font-semibold
+}
+
+.custom-calendar.rmdp-wrapper,
+.rmdp-container .custom-calendar.ep-arrow::after {
+  background-color: bisque;
+}
+
+.rmdp-container .custom-calendar.ep-arrow[direction="bottom"] {
+  border-top: 1px solid bisque;
+}
+
+.rmdp-container .custom-calendar.ep-arrow[direction="top"] {
+  border-bottom: 1px solid bisque;
+}
+
+#printableDiv {
+  display: none;
+}
+
+@media print {
+  #printableDiv {
+    display: block;
+  }
+}
