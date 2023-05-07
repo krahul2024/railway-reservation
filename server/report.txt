@@ -1,0 +1,72 @@
+------------------------------------user model--------------
+User model => Defining structure of the user like what are properties of an user.
+
+Name: Name of the user
+Phone: Phone number of the user
+Username : username of the user (it is unique and can't be updated in future)
+Email: email of the user (it is unique and can be changed/updated with proper verification)
+Password: password to enter the website 
+Address: address of the user and it can be changed in future whenever needed
+Is_Admin: if the user is admin or not
+Reservations: this contains list of all the reservations made by user (current and previous reservations)
+Favourites: this contains list of all the favourite journeys of an user.
+Tokens: this contains list of tokens of user for loggin in and for other access related information
+Joined_Date: date at which user joined
+
+-----------------------------------station model-------------------
+Station model: Defining the structure of station or contents of station
+
+Name: name of the station (unique name but can be changed)
+Code: for identification of a station(unique and can't be changed)
+Address: address of the station 
+
+
+----------------------------------train model------------------
+Train model: Defining structure of the trains like what are properties of trains.
+
+Name: name of the train
+Number: number of the train
+Route : list of routes like stations and timings, it is an array of objects structure is defined in routes model
+Classes: list of all the classes a train has like Sleeper, AC-1, AC-2 , AC-3.
+
+
+---------------------------------route model--------------------------
+Route model: Properties of a route like what will the route model contain
+
+Station_name: Name of the station
+Arrival_time: Time at which the train arrives at a particular station
+Departure_time: Time at which the train departs from a particular station
+Fare: fare till that station and this can be used for determining the fare between two stations
+
+
+---------------------------------class model-------------------------------
+Class model: properties of classes or what are the contents of a class
+
+Name: name of the class
+Fair_Ratio: ratio for determination of fairs for different classes
+Booked_Seats: number of booked seats (initially it will be 0)
+Total_Seats: total number of seats 
+
+------------------------------reservation model--------------------------
+Reservation model: properties of reservation model or what will be the structure of a reservation 
+
+Reservation_Date: date and time at which the reservation was done
+Id: reservation id (unique)
+Train: name of the train for which reservation is done
+Class: reservation classes
+Boarding_Station: station at which journey will start(this information is fetched from route) 
+Destination_Station: station at which journey will end(this information is also fetched from route)
+Amount: total reservation amount 
+Quantity: total number of reservations ( in case if there are more than one reservations then we will just take multiple reservee informations and multiply the price by Quantity as other journey information are same)
+Booked_By: user in whose account this/these reservation(s) is/are done, which also contains all the information like phone number and email in case of contact
+TravellersInformation: list of all the travellers who will travel or for whom the reservations are done
+
+
+-----------------------------
+
+
+
+
+
+
+
