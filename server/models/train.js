@@ -48,7 +48,7 @@ const trainSchema = new mongoose.Schema({
 	},
 	day:{
 		type:Number ,
-	default:7
+	default:0
 	}
 	}],
 	runningDays:[{

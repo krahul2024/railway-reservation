@@ -1,11 +1,13 @@
-import React , { useState , useEffect } from 'react'
+import React , { useState , useEffect , useContext } from 'react'
 import { useNavigate , useLocation } from 'react-router-dom'
 import { MultiSelect } from 'react-multi-select-component'
 import DatePicker from "react-multi-date-picker"
 import './styles.css'
+import { UserContext} from '../userContext.js'
 
 const Home = () => {
 	const navigate = useNavigate() 
+	const { stations } = useContext(UserContext) 
 	const location = useLocation()
 	//---------------------------fetching list of all the classes and stations--------------------------
 	let [classList, setClassList] = useState([{}])
@@ -43,6 +45,8 @@ const Home = () => {
 	useEffect(() => {
 		fetchStations() 
 	},[])
+	// console.log({stations})
+	console.log({stationList})
 
 	const fetchClasses = async () => {
 		try{
@@ -130,7 +134,8 @@ const Home = () => {
 				const term = text.toLowerCase() , value = item.name.toLowerCase() 
 				return value.includes(term) 
 			})
-			if(resultList.length <= 5)setSuggestions(resultList)
+			while(resultList.length >5 ) resultList.pop() 
+			setSuggestions(resultList)
 		}
 		setStartStation({value:text,show:true})
 	}
@@ -141,7 +146,8 @@ const Home = () => {
 				const term = text.toLowerCase() , value = item.name.toLowerCase() 
 				return value.includes(term)
 			})
-			if(resultList.length <= 5)setSuggestions(resultList)
+			while(resultList.length >5 ) resultList.pop() 
+			setSuggestions(resultList)
 		}
 		setEndStation({value:text,show:true})
 	}
@@ -265,7 +271,7 @@ for(let i=0;i<current_date;i++) daysToHide.push(i)
 			 <div className="shadow-2xl rounded-lg mt-6 p-12 brightness-100">
 {/*--------------------------------------for boarding station and destination station----------------------------------------*/}
 				
-				<div className="md:flex gap-12  justify-center shadow-2xl">
+				<div className="md:flex mt-24 gap-12 justify-center shadow-2xl">
 					<div className="flex flex-col p-4 mt-8 justify-center ">
 						<span className="text-cyan-500 font-semibold text-md">Boarding Station</span>
 						<div className="flex items-center gap-3 ">

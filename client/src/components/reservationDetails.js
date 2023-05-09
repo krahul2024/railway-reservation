@@ -63,6 +63,9 @@ const ReservationDetails = () => {
 		values[index][e.target.name] = e.target.value 
 		setUserInfo(values)
 	}
+	const addition_value = stations.boarding.day
+	console.log({addition_value})
+
 	const processReservationInformation = (e) => {
 		e.preventDefault() 
 		if(date.day) {
@@ -102,6 +105,10 @@ const ReservationDetails = () => {
 	let date_now = new Date() , daysToHide = []
 	date_now = date_now.getDate()  //this date is for masking all the dates in calendar till today's date as we aren't allowed to book tickets for days before today
 	for(let i=0;i<date_now;i++) daysToHide.push(i) 
+	let datesToHide = [] , rundays = train.runningDays 
+	for(let i=0;i<rundays.length;i++)datesToHide.push((rundays[i].index+1)%7) 
+	// console.log(datesToHide)
+
 
 	if(location.state.train) return (<>  
 		{/*Train details from here */}
@@ -144,7 +151,7 @@ const ReservationDetails = () => {
 						<div className="flex gap-2 justify-center">
 							{train.runningDays.map((dayItem , dayIndex) => 
 							<span key={dayIndex} className="flex py-1 text-sky-700 font-semibold"
-								>{weekdays[dayItem.index].name}{dayIndex<train.runningDays.length-1?',':''}</span>
+								>{weekdays[dayItem.index].name}{dayIndex<rundays.length-1?',':''}</span>
 							)}
 						</div>	
 				</div>
@@ -182,8 +189,6 @@ const ReservationDetails = () => {
 								<DatePicker 
 
 									mapDays={({ date }) => {
-								  	let datesToHide = []
-								  	train.runningDays.map((item) => datesToHide.push(item.index))
 								    let props = {} 
 								    if (!(datesToHide.includes(date.weekDay.index))) props.hidden = true //this is to hide weekdays on which train does not run
 								    if(daysToHide.includes(date.day)) props.hidden = true // this is to hide days which have passed from current date

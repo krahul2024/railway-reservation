@@ -8,6 +8,7 @@ const AddTrain = () => {
 	let [train , setTrain] = useState({
 		name:"eg. Patna - Guwahati express" , number:"eg. 13054"
 	})
+	const [run , setRun] = useState([]) // this is for list of days on which the train is running
 
 	const [classInput, setClassInput] = useState([{
 		classType:"AC-2",totalSeats:50,fareRatio:4,show:true
@@ -74,7 +75,7 @@ const AddTrain = () => {
 
 //-----------------------------sending train data to the api for addition of the train-----------------------
 	const sendTrainData = async (event) => {
-		console.log("Train Information:\n",train,"\nRoute Information:",routeInput,"\nClass Information:",classInput)
+		console.log("Train Information:\n",train,"\nRoute Information:",routeInput,"\nClass Information:",classInput , {run})
 		event.preventDefault() 
 		const response = await fetch("http://localhost:4000/train/add_train",{
 			method:"POST",
@@ -85,7 +86,8 @@ const AddTrain = () => {
 					name:train.name,
 					number:train.number,
 					classes:classInput,
-					route:routeInput
+					route:routeInput , 
+					runningDays:run  
 			})
 		})
 
@@ -169,6 +171,9 @@ const AddTrain = () => {
 				const value = item.name.toLowerCase() , term = text.toLowerCase() 
 				return value.includes(term )
 			})
+		console.log(resultList.length)
+		while(resultList.length > 5) resultList.pop() 
+		console.log(resultList.length)
 		setSuggestions(resultList) 
 		}
 		const values = [...routeInput] 
@@ -203,6 +208,16 @@ const AddTrain = () => {
 	}
 
 	console.log({stationList} , {classList})
+
+	const setRunningDays = (e) => {
+		const checked = e.target.checked , value = e.target.value  
+		// console.log({checked } , {value })
+		let runDays = run 
+		if(checked && !runDays.includes(value)) runDays.push(value) 
+		else if(!checked && runDays.includes(value)) runDays = runDays.filter( item => item !== value) 
+		setRun(runDays.sort()) //setting the values of a train running on a particular day or list of days
+		// console.log(runDays)
+	}
 //---------------------------------fetching and showing list of stations and classes ends here-------------------------------------------------------------------
 
 
@@ -222,9 +237,9 @@ const AddTrain = () => {
 				<div className="flex flex-col p-8 rounded-lg mt-16 " >
 					<span className="text-cyan-500 text-xl font-semibold">Enter basic information about train</span>
 					
-					<div className="md:flex gap-16 items-center bg-slate-900 p-8 mt-4 rounded-lg">
+					<div className="lg:flex gap-16 items-center bg-slate-900 p-8 mt-4 rounded-lg w-auto">
 						<div className="flex flex-col">
-							<span className=" mt-8 p-1 text-indigo-500 font-semibold">Name of the train</span>
+							<span className="mt-8 p-1 text-indigo-500 font-semibold">Name of the train</span>
 							<input 
 							className="outline-0 w-[400px] border-b border-sky-700 text-md p-1 mt-2 px-3 text-indigo-600 bg-transparent " 
 							type="text" value={train.name} name="name"
@@ -240,6 +255,54 @@ const AddTrain = () => {
 							 onChange={handleTrainInputs}
 							/>
 						</div>
+					</div>
+					<div className="p-3 flex-col justify-start">
+						<span className="font-semibold text-sky-600">Running days for the train</span>
+						<div className="p-2 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 flex justify-center gap-2 mx-auto">
+							<label htmlFor="" 
+								className="flex border-2 px-4 py-1 rounded-lg border-sky-700 cursor-pointer gap-2 w-auto">
+								<input type="checkbox" value = "1" onChange = {setRunningDays}  className="cursor-pointer accent-gray-800"
+									/>
+								Monday
+							</label>
+							<label htmlFor="" onChange = {setRunningDays}
+								className="flex border-2 px-4 py-1 rounded-lg border-sky-700 cursor-pointer gap-2 w-auto ">
+								<input type="checkbox" value = "2" className="cursor-pointer accent-gray-800"
+									 />
+								Tuesday
+							</label>
+							<label htmlFor="" onChange = {setRunningDays}
+								 className="flex border-2 px-4 py-1 rounded-lg border-sky-700 cursor-pointer gap-2 w-auto ">
+								<input type="checkbox" value = "3" className="cursor-pointer accent-gray-800"
+									/>
+								Wednesday
+							</label>
+							<label htmlFor="" onChange = {setRunningDays}
+								 className="flex border-2 px-4 py-1 rounded-lg border-sky-700 cursor-pointer gap-2 w-auto ">
+								<input type="checkbox" value = "4" className="cursor-pointer accent-gray-800"
+									/>
+								Thursday
+							</label>
+							<label htmlFor="" onChange = {setRunningDays}
+								 className="flex border-2 px-4 py-1 rounded-lg border-sky-700 cursor-pointer gap-2 w-auto ">
+								<input type="checkbox" value = "5" className="cursor-pointer accent-gray-800"
+									 />
+								Friday
+							</label>
+							<label htmlFor="" onChange = {setRunningDays}
+								 className="flex border-2 px-4 py-1 rounded-lg border-sky-700 cursor-pointer gap-2 w-auto ">
+								<input type="checkbox" value = "6" className="cursor-pointer accent-gray-800"
+									/>
+								Saturday
+							</label>
+							<label htmlFor="" onChange = {setRunningDays}
+								 className="flex border-2 px-4 py-1 rounded-lg border-sky-700 cursor-pointer gap-2 w-auto ">
+								<input type="checkbox" value = "0" className="cursor-pointer accent-gray-800"
+									/>
+								Sunday
+							</label>
+						</div>
+						
 					</div>
 				</div>
 

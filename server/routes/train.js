@@ -111,6 +111,14 @@ router.get("/train_list" , async (req,res) => {
 	}
 })
 
+// router.get("/exp" , async(req,res) => {
+// 	let trains = await Train.find({})  
+// 	for(let i=0;i<trains.length;i++){
+// 		trains[i].runningDays.sort((a,b) => a.index > b.index ? 1: -1)
+// 		await trains[i].save()
+// 	}
+// })
+
 
 
 
@@ -199,31 +207,45 @@ router.post("/add_class",async (req,res) => {
 router.post("/add_train",async (req, res) => {
 	// console.log(req.body) 
 
-	const { name , number, classes , route } = req.body 
-	console.log(req.body) 
+	const { name , number, classes , route , runningDays } = req.body 
+	// console.log(req.body) 
 	// in this we have to add running days for a train which is in the form of an array containing integers in the range 0-7, 7 is for all days
 	// try{
-	// 	//calculation of departure time by adding stoppage time to arrival time at a particular station
-	// 	let train = await Train.findOne({number}) 
-	// 	if(train) return res.status(400).send({ //in case if we have already a train with this number
-	// 		success:false,
-	// 		msg:`Train number already exists! Please try again with another train number.`,
-	// 		toPath:"/add_train",
-	// 		train
-	// 	})
+		//calculation of departure time by adding stoppage time to arrival time at a particular station
+		let train = await Train.findOne({number}) 
+		if(train) return res.status(400).send({ //in case if we have already a train with this number
+			success:false,
+			msg:`Train number already exists! Please try again with another train number.`,
+			toPath:"/add_train",
+			train
+		})
 
-	// 	for(let i=0;i<route.length;i++){
-	// 			let hour = parseInt(route[i].arrivalTime.split(':')[0]), minute = parseInt(route[i].arrivalTime.split(':')[1])
-	// 			hour = hour*60 + minute + parseInt(route[i].stoppageTime) 
-	// 			minute = hour%60 , hour = Math.floor(hour/60) , hour = hour%24
-	// 			route[i].departureTime = (hour<10?"0"+hour:hour) + ":" + (minute<10?"0"+minute:minute) 
-	// 		}
-	// 	for(let i=0;i<classes.length;i++)classes[i].bookedSeats = 0 	
+		let run = [] 
+		for(let i=0;i<runningDays.length;i++)run.push({index:runningDays[i]})
 
-	// 	train = new Train({ name , classes , route , number })
+		console.log(run) 
 
-	// 	train = await train.save() 
-	// 	// console.log(train)
+		for(let i=0;i<route.length;i++){
+				let hour = parseInt(route[i].arrivalTime.split(':')[0]), minute = parseInt(route[i].arrivalTime.split(':')[1])
+				hour = hour*60 + minute + parseInt(route[i].stoppageTime) 
+				minute = hour%60 , hour = Math.floor(hour/60) , hour = hour%24
+				route[i].departureTime = (hour<10?"0"+hour:hour) + ":" + (minute<10?"0"+minute:minute) 
+				// this is for adding on which day the train is running on a specific route 
+				if(i=== 0) route[i].day = 0  
+				else {
+					let currTime = parseInt(route[i].arrivalTime.split(':')[0]) , prevTime = parseInt(route[i-1].arrivalTime.split(':')[0])
+					console.log({currTime } , {prevTime})
+					if(prevTime > currTime ) route[i].day = route[i-1].day + 1 
+					else if(prevTime <= currTime ) route[i].day = route[i-1].day  
+				}
+			}
+		for(let i=0;i<classes.length;i++)classes[i].bookedSeats = 0 	
+
+		train = new Train({ name , classes , route , number , runningDays:run})
+		console.log(train)
+
+		train = await train.save() 
+		console.log(train)
 
 	// 	if(!train) throw error 
 
@@ -236,7 +258,7 @@ router.post("/add_train",async (req, res) => {
 	// }
 	// catch(error) {
 	// 	// console.log("There was an error! Please try again later.")
-	// 	// console.log(error)
+	// 	console.log(error)
 	// 	return res.status(400).send({
 	// 		success:false,
 	// 		msg:"There was an error adding the train! Please try again later."
@@ -378,26 +400,6 @@ router.post("/update_train", async (req,res) => {
 })
 
 
-router.post("/storeResInfo" , (req, res) => {
-	console.log(req.body) 
-	// res.cookie('accessToken' , token , {
-	// 			withCredentials:true , 
-	// 			httpOnly:true , 
-	// 			maxAge:age*10 ,
-	// 			secure:false 
-	// 		})
-
-	res.cookie('reservationCookie' , resToken , {
-		withCredentials:true ,
-		httpOnly:true ,
-		maxAge:500000000,
-		secure:false 
-	})
-	return res.status(200).send({
-		success:true ,
-		msg:"Reservation details saved successfully. You can login now."
-	})
-})
 
 router.get("/refresh_trains" ,async(req,res) => {
 	const trains = await Train.find({}) 

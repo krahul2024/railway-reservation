@@ -5,8 +5,8 @@ import JsPdf from 'jspdf'
 
 const Tickets = () => {
 	const {profile , setProfile } = useContext(UserContext) 
-	let tickets = profile?profile.reservations[0] : []
-	// console.log(tickets) 
+	let tickets = profile?profile.reservations[profile.reservations.length-1] : []
+	console.log(tickets) 
 
 const generatePdf = () => {
 		const report = new JsPdf('portrait','pt','a2') 
@@ -59,9 +59,9 @@ const generatePdf = () => {
 
 			<div id="printAllTickets" className={`${allTickets} w-auto`}>
 				{
-					profile.reservations[0].map((item , index) => (
+					tickets.length >0 && tickets.map((item , index) => (
 					<div >
-						<div id={`printTicket${index}`} className="flex flex-col justify-center brightness-125 px-8 py-10 m-3 rounded-2xl w-auto">
+						<div id={`printTicket${index}`}  className="flex flex-col justify-center brightness-125 px-8 py-10 m-3 rounded-2xl w-auto">
 							<span className="p-2 font-semibold text-green-500 text-lg">Ticket for Person {index+1}</span>
 							<div className="flex gap-2">
 								<td className="text-md font-semibold text-sky-500">Booking Time </td>
@@ -101,7 +101,7 @@ const generatePdf = () => {
 											<td className="text-md font-semibold text-sky-500">Boarding Station</td>
 											<span className="text-cyan-600">:</span>
 											<td className="text-blue-600">
-												{`${item.stations.boarding.stationName}(${item.stations.boarding.stationCode}) ${item.stations.boarding.arrivalTime} ${item.date.day.value + item.stations.boarding.day} ${item.date.month.name} ${item.date.year}`} 
+												{`${item.stations.boarding.stationName}(${item.stations.boarding.stationCode}) ${item.stations.boarding.arrivalTime} ${item.date.day.value } ${item.date.month.name} ${item.date.year}`} 
 											</td>
 										</div>
 										<div className="flex gap-2">

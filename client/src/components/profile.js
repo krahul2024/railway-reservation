@@ -1,6 +1,8 @@
-import React , { useState , useEffect } from 'react' 
+import React , { useState , useEffect , useContext } from 'react' 
 import { NavLink , useLocation , useNavigate , useParams} from 'react-router-dom'
 import profileImage from '../images/profile.jpg'
+import {UserContext }from '../userContext.js'
+import Tickets from './ticket.js'
 
 const Profile = () => {
 
@@ -8,56 +10,35 @@ const Profile = () => {
 	const location = useLocation()
 	const { subpage } = useParams() 
 
-	let [user, setUser] = useState({})
+	const {profile , setProfile } = useContext(UserContext)
+
+	if(profile) console.log(profile.reservations)
+
 	let [storedResInfo , setStoredResInfo] = useState(null) 
+
 	useEffect(() => {
 		const result = JSON.parse(localStorage.getItem('storedResInfo')) 
+		// console.log({result})
 		setStoredResInfo(result) 
 	},[])
+	// console.log({storedResInfo})
+	let basic_information = []
 
-	console.log(storedResInfo)
-
-	const basic_information = [{
-			title:"Username" , value:user.username
+	if(profile) basic_information = [{
+			title:"Username" , value:profile.username
 		},{
-			title:"Name"  , value:user.name,
+			title:"Name"  , value:profile.name,
 		},{
-			title:"Date Joined" , value:user.joinedAt
+			title:"Date Joined" , value:profile.joinedAt
 		},
 		{
-			title:"E-mail" , value:user.email
+			title:"E-mail" , value:profile.email
 		},{
-			title:"Phone" , value:user.phone
+			title:"Phone" , value:profile.phone
 		},{
-			title:"Address" , value:user.address
+			title:"Address" , value:profile.address
 		}
 		]
-	const fetchUser = async () => {
-
-		try{
-			const response = await fetch('http://localhost:4000/user/profile',{
-					withCredentials:true ,
-					method:"GET",
-					headers:{
-						Accept:"application/json",
-						"Content-Type":"application/json"
-					},
-					credentials:"include"
-				})
-
-			const result = await response.json() 
-			if(!result.success) throw new Error(result.msg) 
-			console.log(result)
-			setUser(result.user)
-		}
-		catch(error){
-			console.log(error) 
-			// error.message?window.alert(error.message):window.alert("There was an error! Please try again later.")
-		}
-
-	}
-
-	useEffect(() => { fetchUser()} , [] ) 
 
 	function presentClass(url) {
 		let classes = 'inline-flex text-center items-center border border-sky-800 bg-transparent gap-3 px-6 py-2 text-cyan-600 font-semibold rounded-full'
@@ -66,13 +47,41 @@ const Profile = () => {
 	} 
 
 	const processLogout = async(e) => {
+		e.preventDefault() 
+		console.log(profile)  
+		localStorage.removeItem('storedResInfo') //removing stored reservation item in case if user is logging out
 
+		try{
+			const response = await fetch("http://localhost:4000/user/logout",{
+				method:"POST",
+				credentials:"include",
+				headers:{
+					"Content-Type":"application/json"
+				},
+				body:JSON.stringify({
+					username:profile.username , name:profile.name
+				})
+			})
+
+			const result = await response.json() 
+			console.log(result) 
+			if(!result.success) throw new Error(result.msg) 
+			else if(result.success){
+				setProfile(null) 
+				window.location.reload() //refreshing the page which will redirect automatically to homepage
+			}
+
+		}
+		catch(error) {
+			console.log(error) 
+			// error.message?window.alert(error.message):window.alert("There was an error loggin you in! Please try again later.")
+		}
 	}
 
 
 	return (<> 
 
-	{ user && ( 
+	{ profile && ( 
 		<div>
 		<nav className="flex w-full justify-center p-12 gap-4"> 
 			<NavLink to = {`/user/profile`}  
@@ -140,7 +149,7 @@ const Profile = () => {
 										<button onClick={() => {
 											navigate("/update_profile",{
 												state:{
-													user
+													user:profile
 												}
 											})
 										}}
@@ -154,7 +163,7 @@ const Profile = () => {
 										<button onClick={() => {
 											navigate("/",{
 												state:{
-													user
+													user:profile
 												}
 											})
 										}}
@@ -195,8 +204,34 @@ const Profile = () => {
 		</div>
 			
 		)}
+		{ subpage === 'reservations' && (
 
-	{!user && (
+			<div>
+				{
+					profile && profile.reservations.length === 0 && (
+						<div>Nothing to show here</div>
+						)
+				}
+				{
+					profile && profile.reservations.map((item) => (
+
+						<Tickets tickets = {item} />
+
+						))
+				}
+			</div>
+			)}
+
+			{
+				subpage === 'favourites' && (
+					<div className="flex justify-center">
+						<span className="p-4 text-sky-500 font-semibold">Nothing to show here</span>
+					</div>
+
+					)
+			}
+
+		{!profile && (
 			<div>Login to see profile information</div>
 		) }
 

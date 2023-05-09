@@ -100,7 +100,7 @@ const TrainDetails = (props) => {
 						  			<span className="px-4 py-1 text-md font-semibold text-indigo-800 brightness-150 px-16">{classItem.totalSeats- Math.floor(classItem.totalSeats*Math.random()+5)%30 + classItem.bookedSeats}</span>
 						  		</div>
 						  		<div className="p-2 flex gap-4">
-						  			<span className="px-2 py-1 text-md font-semibold text-indigo-600 text-center">Fare: Rs. {distance *( classItem.fareRatio?classItem.fareRatio:classItem.fairRatio)}</span>
+						  			<span className="px-2 py-1 text-md font-semibold text-indigo-600 text-center">Fare: Rs. {(distance *( classItem.fareRatio?classItem.fareRatio:classItem.fairRatio)).toFixed(2)}</span>
 						  			<span onClick = { () => {
 						  				navigate("/reservation_details",{
 						  					state:{
@@ -111,7 +111,7 @@ const TrainDetails = (props) => {
 						  					}
 						  				})
 						  			} }
-						  				className="flex items-center cursor-pointer px-3 py-1.5 border border-sky-900 hover:border-transparent hover:bg-indigo-800 hover:text-gray-800 font-semibold text-sky-700 rounded-full w-auto"
+						  				className="flex justify-items-center text-center cursor-pointer px-3 py-1.5 border border-sky-900 hover:border-transparent hover:bg-indigo-800 hover:text-gray-800 font-semibold text-sky-700 rounded-full w-auto"
 						  					>Get Tickets</span>
 						  		</div>
 						  	</div>

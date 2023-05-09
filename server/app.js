@@ -19,16 +19,16 @@ app.use(express.json())  // for using json format and other stuff related to idk
 
 //connecting to the database
 const connection_uri = "mongodb+srv://sandipkumar2024:q79XDvGOuM7j7rjf@cluster0.rzeza5v.mongodb.net/?retryWrites=true&w=majority"
-mongoose.connect(connection_uri , {
-	useNewUrlParser:true , useUnifiedTopology:true
-}).then(() => console.log('Connected to the database successfully'))
-	.catch(error => console.log('There was an error connecting to the database. Please try again later.'))
-// mongoose.set('strictQuery', false)
-// mongoose.connect('mongodb://0.0.0.0:27017/railDB',{ useNewUrlParser : true })
-// 	.then(() => console.log(`Connected to the database successfully!`))
-// 	.catch((error) => {
-// 		console.log(`There was an error connecting to the database. ${error}`) // printing the error
-// 	})
+// mongoose.connect(connection_uri , {
+// 	useNewUrlParser:true , useUnifiedTopology:true
+// }).then(() => console.log('Connected to the database successfully'))
+// 	.catch(error => console.log('There was an error connecting to the database. Please try again later.'))
+mongoose.set('strictQuery', false)
+mongoose.connect('mongodb://0.0.0.0:27017/railDB',{ useNewUrlParser : true })
+	.then(() => console.log(`Connected to the database successfully!`))
+	.catch((error) => {
+		console.log(`There was an error connecting to the database. ${error}`) // printing the error
+	})
 
 app.get("/",(req,res) => {
 	res.send("hello bro")

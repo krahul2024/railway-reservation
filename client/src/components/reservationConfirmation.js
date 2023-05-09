@@ -8,62 +8,15 @@ const ReservationConfirmation = () => {
 	const location = useLocation() 
 	const navigate = useNavigate() 
 	const {profile , setProfile} = useContext(UserContext) 
-
 	const resInfo = location.state.resInfo
 	const train = resInfo.train, stations = resInfo.stations 
 	const resClass = resInfo.class , distance = resInfo.distance 
 	const users = resInfo.users , quantity = Math.max(users.length , resInfo.quantity) 
 	const date = resInfo.date 
-	let [user , setUser] = useState({})
 	let [storedResInfo , setStoredResInfo] = useState(null)
 
-
-	const storeReservationInfo = async () => {
-		const response = await fetch("http://localhost:4000/train/storeResInfo" , {
-			method:"POST",
-			headers:{
-				Accept:"application/json",
-				"Content-Type":"application/json"
-			},
-			body:JSON.stringify({
-				resInfo 
-			}),
-			withCredentials:true ,
-			credentials:"include"
-		})
-
-		const result = await response.json() 
-		console.log(result)
-	}
+	console.log({profile})
 	
-	//for confirmation of ticket and booking in the name of user
-	const fetchUser = async () => {
-		try{
-		const response = await fetch('http://localhost:4000/user/profile',{
-				withCredentials:true ,
-				method:"GET",
-				headers:{
-					Accept:"application/json",
-					"Content-Type":"application/json"
-				},
-				credentials:"include"
-			})
-
-		const result = await response.json() 
-		if(!result.success) {
-			window.alert("Please login to continue your ticket booking. Thanks.")
-			storeReservationInfo()
-			navigate("/login")
-		}
-		console.log(result)
-		// window.alert(result.msg)
-		setUser(result.user)
-	}
-	catch(error){
-		console.log(error) 
-		error.message?window.alert(error.message):window.alert("There was an error! Please try again later.")
-		}
-	}
 
 	useEffect(() => {
 		setStoredResInfo(resInfo)
@@ -77,17 +30,20 @@ const ReservationConfirmation = () => {
 
 	const processReservation = async (e) => {
 		e.preventDefault() 
-		localStorage.removeItem('storedResInfo') //removing previously stored reservation information in case if the reservation is confirmed
-		fetchUser() //getting the details of user 
-		// console.log('user ' ,user.user) 
 
+		if(!profile){
+			alert('Please login to continue reservation.Thanks')
+			navigate('/login')
+		}
+
+		localStorage.removeItem('storedResInfo') 
 		const response = await fetch("http://localhost:4000/user/confirmReservation" , {
 			method:"POST",
 			headers:{
 				"Content-Type":"application/json"
 			},
 			body:JSON.stringify({
-				resInfo , user , username:user.username , name:user.name
+				resInfo , user:profile , username:profile.username , name:profile.name
 			})
 		} )
 
