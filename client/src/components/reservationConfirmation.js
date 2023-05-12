@@ -33,6 +33,7 @@ const ReservationConfirmation = () => {
 
 		if(!profile){
 			alert('Please login to continue reservation.Thanks')
+			localStorage.setItem('storedResInfo' , JSON.stringify(storedResInfo))
 			navigate('/login')
 		}
 
@@ -181,17 +182,13 @@ const ReservationConfirmation = () => {
 
 				<div className="p-8 flex gap-8 flex justify-center text-center shadow-xl backdrop-brightness-105 mt-8">
 					<button onClick={(e) => processReservation(e)}
-						className="rounded-xl shadow-2xl border-2  p-1.5 hover:border-transparent hover:border-cyan-900 hover:brightness-150 text-cyan-500 text-lg hover:font-semibold hover:shadow-2xl border-cyan-700">
+						className="rounded-lg shadow-2xl border-2 px-4 py-2 hover:border-transparent hover:border-cyan-900 hover:brightness-150 text-cyan-500 text-lg hover:bg-blue-600 hover:text-black hover:font-semibold hover:shadow-2xl border-cyan-700">
 						Confirm & Pay</button>
 					<NavLink to = "/" 
-						className="rounded-xl shadow-2xl border-2  p-1.5 hover:border-transparent hover:border-cyan-900 hover:brightness-150 text-cyan-500 text-lg hover:font-semibold hover:shadow-2xl border-cyan-700">
+						className="rounded-lg shadow-2xl border-2 px-4 py-2 hover:border-transparent hover:border-cyan-900 hover:brightness-150 text-cyan-500 text-lg hover:bg-blue-600 hover:text-black hover:font-semibold hover:shadow-2xl border-cyan-700">
 						Leave it</NavLink>
-					<button onClick={(e) => addToWishlist(e)}
-						className="rounded-xl shadow-2xl border-2  p-1.5 hover:border-transparent hover:border-cyan-900 hover:brightness-150 text-cyan-500 text-lg hover:font-semibold hover:shadow-2xl border-cyan-700">
-						
-						Add To WishList</button>
 					<button onClick={() => generatePdf() }
-						className="rounded-xl shadow-2xl border-2  p-1.5 hover:border-transparent hover:border-cyan-900 hover:brightness-150 text-cyan-500 text-lg hover:font-semibold hover:shadow-2xl border-cyan-700">
+						className="rounded-lg shadow-2xl border-2 px-4 py-2 hover:border-transparent hover:border-cyan-900 hover:brightness-150 text-cyan-500 text-lg hover:bg-blue-600 hover:text-black hover:font-semibold hover:shadow-2xl border-cyan-700">
 						
 						print</button>
 				</div>

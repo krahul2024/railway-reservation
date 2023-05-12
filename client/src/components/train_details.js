@@ -46,6 +46,16 @@ const TrainDetails = (props) => {
 
 	console.log(endCode , startCode ,endRoute , startRoute)
 
+	const addition_value = startRoute.day
+	// console.log({addition_value})
+	let date_now = new Date() , daysToHide = []
+	date_now = date_now.getDate()  //this date is for masking all the dates in calendar till today's date as we aren't allowed to book tickets for days before today
+	for(let i=0;i<date_now;i++) daysToHide.push(i) 
+	let datesToHide = [] , rundays = train.runningDays 
+	for(let i=0;i<rundays.length;i++)datesToHide.push((rundays[i].index+addition_value)%7) 
+	datesToHide.sort((a,b) => a>b?1:-1) 
+	console.log(datesToHide)
+
 	if(location.state.train)return (<> 
 		<div className=" py-4 backdrop-blur-3xl ">
 			<form action="">
@@ -74,11 +84,12 @@ const TrainDetails = (props) => {
 						<div className="flex flex-col justify-center p-1">
 							<span className="flex justify-center text-lg font-semibold text-cyan-600 p-1 mt-3">Runs On </span>
 							<div className="flex gap-2 justify-center">
-								{train.runningDays.map((dayItem , dayIndex) => 
+								{datesToHide.map((dayItem , dayIndex) => 
 								<span key={dayIndex} className="flex py-1 text-sky-700 font-semibold"
-									>{weekdays[dayItem.index].name}{dayIndex<train.runningDays.length-1?',':''}</span>
+									>{weekdays[dayItem].name}{dayIndex<train.runningDays.length-1?',':''}</span>
 								)}
 							</div>	
+							<span className="flex justify-center text-sm text-indigo-600">(from {startRoute.stationName})</span>
 						</div>
 					</div>
 
@@ -135,6 +146,7 @@ const TrainDetails = (props) => {
 								<th className="md:px-6 px-4 py-6 text-center">Departure Time</th>
 								<th className="md:px-6 px-4 py-6 text-center">Stoppage Time(in minutes)</th>
 								<th className="md:px-6 px-4 py-6 text-center">Distance Covered(in KMs)</th>
+								<th className="md:px-6 px-4 py-6 text-center">Day</th>
 							</tr>
 							</thead>
 
@@ -155,6 +167,9 @@ const TrainDetails = (props) => {
 									</td>
 									<td className="md:px-6 px-4 py-6 text-center">
 										{routeItem.distanceUpto}
+									</td>
+									<td className="md:px-6 px-4 py-6 text-center">
+										{routeItem.day}
 									</td>
 								</tr>
 								)}

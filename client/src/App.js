@@ -14,6 +14,7 @@ import Profile from './components/profile.js'
 import Header from './components/header.js'
 import {UserContextProvider , UserContext } from './userContext.js'
 import Tickets from './components/tickets.js'
+import PnrStatus from './components/pnrStatus.js'
 
 function App() {
   return ( <>
@@ -36,6 +37,7 @@ function App() {
           <Route path = "/update_profile" element = { <UpdateProfile /> } />
           <Route path = "/user/:subpage" element = { <Profile /> } /> 
           <Route path = "/reservations" element = { <Tickets /> } />
+          <Route path = "/pnr-status" element = { <PnrStatus /> } /> 
 
         </Routes>
 

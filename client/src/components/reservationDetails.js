@@ -106,8 +106,9 @@ const ReservationDetails = () => {
 	date_now = date_now.getDate()  //this date is for masking all the dates in calendar till today's date as we aren't allowed to book tickets for days before today
 	for(let i=0;i<date_now;i++) daysToHide.push(i) 
 	let datesToHide = [] , rundays = train.runningDays 
-	for(let i=0;i<rundays.length;i++)datesToHide.push((rundays[i].index+1)%7) 
-	// console.log(datesToHide)
+	for(let i=0;i<rundays.length;i++)datesToHide.push((rundays[i].index+addition_value)%7) 
+	datesToHide.sort((a,b) => a>b?1:-1) 
+	console.log(datesToHide)
 
 
 	if(location.state.train) return (<>  
@@ -149,11 +150,13 @@ const ReservationDetails = () => {
 				<div className="flex flex-col justify-center p-1 brightness-125">
 						<span className="flex justify-center text-lg font-semibold text-cyan-600 p-1 ">Runs On </span>
 						<div className="flex gap-2 justify-center">
-							{train.runningDays.map((dayItem , dayIndex) => 
+							{datesToHide.map((item , dayIndex) => 
 							<span key={dayIndex} className="flex py-1 text-sky-700 font-semibold"
-								>{weekdays[dayItem.index].name}{dayIndex<rundays.length-1?',':''}</span>
+								>{weekdays[item].name}{dayIndex<rundays.length-1?',':''}</span>
 							)}
+
 						</div>	
+						<span className="flex justify-center text-sm text-indigo-600">(from {stations.boarding.stationName})</span>
 				</div>
 			</div>
 		</div>

@@ -1,18 +1,19 @@
-import express from 'express'  
-import send_mail from './mail.js' 
-console.log('sending the mail.....')
-const message = 'this is testing  mail'  
-const options = {
-	from : 'rahulstestmail2024@gmail.com',
-	to: 'sandipkumar2024@gmail.com',
-	subject:'testing purpose',
-	text:message ,
-	html:'<div>this is html part for this testing mail</div>'
+// console.log(new Date())
+// console.log(Date())
+const present = {
+	time:{
+		hour:Date().split(' ')[4].split(':')[0],
+		minute:Date().split(' ')[4].split(':')[1]
+	},
+	day:{
+		index:new Date().getDate(),
+		weekday : Date().split(' ')[0]
+	},
+	month:{
+		index:new Date().getMonth(),
+		name: Date().split(' ')[1]
+	},
+	year:Date().split(' ')[3]
 }
-console.log('this is intermediate stage....')
 
-send_mail(options , (info) => {
-	console.log('email send')  
-	console.log('message id: ' , info.message)
-	console.log({info})
-})
+// console.log({present})
