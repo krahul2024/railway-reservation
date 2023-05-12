@@ -6,6 +6,8 @@ import Ticket from '../models/ticket.js'
 import Train from '../models/train.js'
 import cookieParser from 'cookie-parser'
 import auth from '../middlewares/auth.js'
+import sendMail from './mail.js'
+import get_html from './html.js'
 const router = express.Router() 
 
 router.use(cookieParser())
@@ -181,7 +183,9 @@ router.post("/confirmReservation" , auth, async(req,res) => {
 	// console.log(req.body)
 	const {resInfo } = req.body , reservations = []
 
-	// try{ 
+	console.log({resInfo})
+
+	try{ 
 
 			let bookUser = await User.findOne({username:req.body.user.username}) 
 			// in case of any error
@@ -189,6 +193,7 @@ router.post("/confirmReservation" , auth, async(req,res) => {
 				msg:"There was an error during ticket booking! Please try again later",
 				success:false 
 			})
+			const email_of_user = bookUser.email  
 			const train = {
 				name : resInfo.train.name ,
 				number : resInfo.train.number ,
@@ -229,7 +234,8 @@ router.post("/confirmReservation" , auth, async(req,res) => {
 				jClass.seats[seat] = true 
 				jClass.bookedSeats += 1 
 				emptySeats.pop() 
-
+				users[i].pnr = pnr_values[i] 
+				users[i].seat = seat  
 				let ticket = new Ticket({
 					pnr:pnr_values[i] , user , seat , jClass , stations , distance , quantity , train , date 
 				})
@@ -246,7 +252,6 @@ router.post("/confirmReservation" , auth, async(req,res) => {
 					msg:"There was an error. Please try again later.",
 					success:false 
 				})
-				if(pnr_value)console.log(pnr_value) 
 			}
 
 			//------updating ticket values and user information 
@@ -290,19 +295,26 @@ router.post("/confirmReservation" , auth, async(req,res) => {
 
 
 			user_value.password = null //setting password as null
+			
+
+			//sending mail to the user 
+			const message = get_html(users , reservations[0])  
+			const response = await sendMail(email_of_user , message)  
+			console.log({response})
+
 			return res.status(200).send({
 				msg:"Booking successful!",
 				success:true ,
 				user:user_value
 			})
-	/*}
+	}
 	catch(error) {
 		console.log(error) 
 		return res.status(400).send({
 			success:false ,
 			msg:"There was an error during reservation! Please try again later.",
 		})
-	} */
+	} 
 
 })
 
@@ -328,7 +340,6 @@ router.post("/logout",auth , async(req,res) => {
 		toPath:"/"
 	})
 })
-
 
 
 export default router 
