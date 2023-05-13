@@ -34,7 +34,8 @@ const userSchema = new mongoose.Schema({
 	},
 	reservations:[],
 	wishlist:[],
-	token :String 
+	token :String ,
+	otp:Number 
 })
 
 userSchema.methods.generateAuthToken = async function () {

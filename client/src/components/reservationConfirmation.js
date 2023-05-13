@@ -14,6 +14,9 @@ const ReservationConfirmation = () => {
 	const users = resInfo.users , quantity = Math.max(users.length , resInfo.quantity) 
 	const date = resInfo.date 
 	let [storedResInfo , setStoredResInfo] = useState(null)
+	const [otp , setOtp] = useState(null)
+	const [confirm , setConfirm] = useState(false)
+	const [sent , setSent] = useState(false)
 
 	console.log({profile})
 	
@@ -28,6 +31,60 @@ const ReservationConfirmation = () => {
 		console.log('Reservation information',result)  
 	})
 
+	const sendOtp = async(e) => {
+		e.preventDefault() 
+		//sending otp for user authentication 
+		try{
+			const response = await fetch("http://localhost:4000/train/send_otp",{
+				method:"POST",
+				credentials:"include",
+				headers:{
+					"Content-Type":"application/json"
+				},
+				body:JSON.stringify({
+					user:profile
+				})
+			})
+			const result = await response.json() 
+			if(result.success) setSent(true) 
+			alert(result.msg) 
+		}
+		catch(error) {
+			console.log(error) 
+			alert('There was an error! Please try again later.')
+		}
+	}
+
+	const verifyOtp = async(e) => {
+		e.preventDefault() 
+		console.log(otp)
+		// this will be shown in last after successful otp verification 
+		try{
+			const response = await fetch("http://localhost:4000/train/verify_otp",{
+				method:"POST",
+				credentials:"include",
+				headers:{
+					"Content-Type":"application/json"
+				},
+				body:JSON.stringify({
+					otp
+				})
+			})
+			console.log(response) 
+
+			const result = await response.json() 
+			if(result.success){
+			 setSent(false) 
+			 setConfirm(true) 
+			 alert(result.msg) 
+			}
+		}
+		catch(error) {
+			console.log(error) 
+			alert('There was an error! Please try again later.')
+		}
+	}
+			
 	const processReservation = async (e) => {
 		e.preventDefault() 
 
@@ -37,7 +94,7 @@ const ReservationConfirmation = () => {
 			navigate('/login')
 		}
 
-		localStorage.removeItem('storedResInfo') 
+		// localStorage.removeItem('storedResInfo') 
 		const response = await fetch("http://localhost:4000/user/confirmReservation" , {
 			method:"POST",
 			headers:{
@@ -47,6 +104,7 @@ const ReservationConfirmation = () => {
 				resInfo , user:profile , username:profile.username , name:profile.name
 			})
 		} )
+
 
 		const result = await response.json() 
 		// if(result) //remove reservation information stored in local storage
@@ -64,6 +122,7 @@ const ReservationConfirmation = () => {
 		e.preventDefault() 
 		console.log("This adding to wishlist of the user.....")
 	}
+
 
 	const generatePdf = () => {
 		const report = new JsPdf('portrait','pt','a2') 
@@ -179,18 +238,44 @@ const ReservationConfirmation = () => {
 
 				</div>
 			</div>
+				<div className="p-8 flex gap-3 flex justify-center text-center shadow-xl backdrop-brightness-105 mt-8">
+					{confirm && (
+						<div className="flex gap-3">
+							<button onClick={(e) => processReservation(e)}
+								className="rounded-lg shadow-2xl border-2 px-4 py-2 hover:border-transparent hover:border-cyan-900 hover:brightness-150 text-cyan-500 text-lg hover:bg-blue-600 hover:text-black hover:font-semibold hover:shadow-2xl border-cyan-700">
+								Confirm & Pay</button>
+							<NavLink to = "/" 
+								className="rounded-lg shadow-2xl border-2 px-4 py-2 hover:border-transparent hover:border-cyan-900 hover:brightness-150 text-cyan-500 text-lg hover:bg-blue-600 hover:text-black hover:font-semibold hover:shadow-2xl border-cyan-700">
+								Leave it</NavLink>
+							<button onClick={() => generatePdf() }
+								className="rounded-lg shadow-2xl border-2 px-4 py-2 hover:border-transparent hover:border-cyan-900 hover:brightness-150 text-cyan-500 text-lg hover:bg-blue-600 hover:text-black hover:font-semibold hover:shadow-2xl border-cyan-700">
+								print</button>
+						</div>
+					)}
+					
 
-				<div className="p-8 flex gap-8 flex justify-center text-center shadow-xl backdrop-brightness-105 mt-8">
-					<button onClick={(e) => processReservation(e)}
-						className="rounded-lg shadow-2xl border-2 px-4 py-2 hover:border-transparent hover:border-cyan-900 hover:brightness-150 text-cyan-500 text-lg hover:bg-blue-600 hover:text-black hover:font-semibold hover:shadow-2xl border-cyan-700">
-						Confirm & Pay</button>
-					<NavLink to = "/" 
-						className="rounded-lg shadow-2xl border-2 px-4 py-2 hover:border-transparent hover:border-cyan-900 hover:brightness-150 text-cyan-500 text-lg hover:bg-blue-600 hover:text-black hover:font-semibold hover:shadow-2xl border-cyan-700">
-						Leave it</NavLink>
-					<button onClick={() => generatePdf() }
-						className="rounded-lg shadow-2xl border-2 px-4 py-2 hover:border-transparent hover:border-cyan-900 hover:brightness-150 text-cyan-500 text-lg hover:bg-blue-600 hover:text-black hover:font-semibold hover:shadow-2xl border-cyan-700">
-						
-						print</button>
+					{
+						!confirm && (
+							<div className="md:flex gap-2">
+								{ sent && (
+									<div className="flex gap-2">
+										<input name = "otp" onChange = {(e) => setOtp(e.target.value)}
+											className="p-2.5 bg-transparent border-sky-600 border-2 rounded-lg px-8 hover:border-indigo-600 outline-0 text-indigo-600"
+											type="text"/>
+										<button onClick={(e) => verifyOtp(e) }
+											className="rounded-lg shadow-2xl border-2 px-4 py-2 hover:border-transparent hover:border-cyan-900 hover:brightness-150 text-cyan-500 text-lg hover:bg-blue-600 hover:text-black hover:font-semibold hover:shadow-2xl border-cyan-700">
+											Verify OTP</button>
+									</div>
+								)}
+								<button onClick={(e) => sendOtp(e) }
+									className="mt-2 md:mt-0 rounded-lg shadow-2xl border-2 px-4 py-1 hover:border-transparent hover:border-cyan-900 hover:brightness-150 text-cyan-500 text-lg hover:bg-blue-600 hover:text-black hover:font-semibold hover:shadow-2xl border-cyan-700">
+									{`${sent?'Re':''}`}send confirmation OTP</button>
+							</div>
+							
+
+							)
+					}
+					
 				</div>
 
 		</>)

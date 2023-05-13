@@ -78,7 +78,7 @@ const get_html = (users , ticket) => {
 
 const html_message = start + j_details + mid_values + user_details + end_values 
 
-console.log({html_message}) 
+// console.log({html_message}) 
 return html_message 
 }
 

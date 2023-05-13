@@ -1,12 +1,14 @@
-import React, { useState }  from 'react' 
+import React, { useState , useContext }  from 'react' 
 import { useLocation  , useNavigate , NavLink} from 'react-router-dom'
 import DatePicker from "react-multi-date-picker"
 import './styles.css'
+import {UserContext} from '../userContext.js'
 
 
 const ReservationDetails = () => {
 	const location = useLocation() 
 	const navigate = useNavigate()
+	const {profile , setProfile } = useContext(UserContext)
 	const weekdays = [
 	  { index: 0, name: 'Sunday', short: 'Sun' },
 	  { index: 1, name: 'Monday', short: 'Mon' },
@@ -21,7 +23,7 @@ const ReservationDetails = () => {
 	let [quantity , setQuantity] = useState(0)
 	let[exclude , setExclude] = useState(false)
 	let [userInfo , setUserInfo] = useState([{
-		name:"name of person"  , email:"user@email.com" , phone:"053201233", age:22, address:"Shivaji park Punjabi Bagh Delhi"
+		name:"name of person"  , email:profile?.email, phone:profile?.phone, age:22, address:profile?.address
 	}])
 	let [date , setDate] = useState(new Date())
 	console.log(date)
@@ -40,10 +42,10 @@ const ReservationDetails = () => {
 		const value = [...userInfo] 
 		value.push({
 			name:"name of person" , 
-			email:"user@email.com" , 
-			phone:"053201233", 
+			email:profile?.email , 
+			phone:profile?.phone, 
 			age:22, 
-			address:"Shivaji park Punjabi Bagh Delhi"
+			address:profile?.address
 		})
 		setUserInfo(value) 
 	}

@@ -17,6 +17,7 @@ const ticketSchema = new mongoose.Schema({
 		phone:String,
 		email:String
 	},
+	bookedBy:String,
 	train:{
 		name:String,
 		number:String ,

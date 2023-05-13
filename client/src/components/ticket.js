@@ -7,6 +7,7 @@ const Tickets = ({tickets }) => {
 	const showTickets = () => {
 		setShow(true) 
 	}
+	console.log({tickets})
 
 	return (<>	
 		<div className="flex justify-center">
@@ -41,6 +42,11 @@ const Tickets = ({tickets }) => {
 										<td className="text-md font-semibold text-sky-500">PNR</td>
 										<span className="text-cyan-600">:</span>
 										<td className="text-blue-600">{item.pnr}</td>
+									</div>
+									<div className="flex gap-2">
+										<td className="text-md font-semibold text-sky-500">Status</td>
+										<span className="text-cyan-600">:</span>
+										<td className="text-blue-600">{item.status}</td>
 									</div>
 									
 								</div>

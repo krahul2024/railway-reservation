@@ -266,7 +266,7 @@ for(let i=0;i<current_date;i++) daysToHide.push(i)
 			<span className="italic text-sky-600 brightness-105">you can search trains using either station name of train details.</span>
 		</div>
 
-		<div className="flex justify-center items-center mt-2 h-screen rounded-lg ">
+		<div className="flex justify-center items-center mt-48 md:mt-6 h-screen rounded-lg ">
 			<form action="">
 			 <div className="shadow-2xl rounded-lg mt-6 p-12 brightness-100">
 {/*--------------------------------------for boarding station and destination station----------------------------------------*/}

@@ -237,7 +237,7 @@ router.post("/confirmReservation" , auth, async(req,res) => {
 				users[i].pnr = pnr_values[i] 
 				users[i].seat = seat  
 				let ticket = new Ticket({
-					pnr:pnr_values[i] , user , seat , jClass , stations , distance , quantity , train , date 
+					pnr:pnr_values[i] , bookedBy:bookUser._id, user , seat , jClass , stations , distance , quantity , train , date 
 				})
 				// console.log("ticket for ",i+1,"the user",ticket)
 				reservations.push(ticket) //adding tickets to user reservations list

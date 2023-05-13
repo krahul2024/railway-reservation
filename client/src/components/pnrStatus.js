@@ -27,8 +27,27 @@ const PnrStatus = () => {
 		if(result.success) setStatus(result) 
 		setSuccess(result.success)
 	}
-	
 
+	console.log(status)
+	
+	const cancelTicket = async(e) => {
+		e.preventDefault() 
+		console.log({pnr})
+
+		const response = await fetch("http://localhost:4000/train/cancel_ticket",{
+				method:"POST",
+				credentials:"include",
+				headers:{
+					"Content-Type":"application/json"
+				},
+				body:JSON.stringify({
+					pnr
+				})
+			})
+		const result = await response.json() 
+		console.log({result})
+
+	}
 
 	return (<> 
 
@@ -55,7 +74,12 @@ const PnrStatus = () => {
 			{ success && status && (
 			<div>
 				<div>
-					<span className="px-4 py-1 mt-8 flex justify-items-center text-green-500 ">Seat Status : {status.seat_status} </span>
+					<div className="flex p-2 gap-2">
+						<span className="px-4 py-1 mt-8 flex justify-items-center text-green-500 ">Seat Status : {status.seat_status} </span>
+						<button onClick = { (e) => cancelTicket(e) }
+							className="px-4 py-1 mt-8 text-red-500 text-md font-semibold border-red-600 border-2 rounded-lg flex text-center hover:bg-orange-700 hover:border-transparent hover:text-black"
+							>Cancel Ticket</button>
+					</div>
 					<span className="px-4 py-1 flex justify-items-center text-green-500 ">Seat No. : {status.seat} </span>
 					<span className="px-4 py-1 flex justify-items-center text-green-500 ">Train Status : {status.train_status} </span>
 					{status.presentStation && (<span className="px-4 py-1 flex justify-items-center text-green-500 font-semibold">Next stop is: {status.presentStation.stationName}</span>)}
@@ -63,7 +87,7 @@ const PnrStatus = () => {
 				{
 					status && status.stations && (
 						<div className="flex flex-col justify-items-center px-4 py-2 text-green-500">
-							<span>Boarding from : {status.stations.boarding.stationName} ({status.stations.boarding.stationCode}) at {status.stations.boarding.departureTime}</span>
+							<span>Boarding from : {status.stations.boarding.stationName} ({status.stations.boarding.stationCode}) at {status.stations.boarding.departureTime} on <strong>{status.date.day.value} {status.date.month.name} {status.date.year}</strong></span>
 							<span>Arriving at : {status.stations.destination.stationName} ({status.stations.destination.stationCode}) at {status.stations.destination.arrivalTime}</span>
 						</div>
 						)
