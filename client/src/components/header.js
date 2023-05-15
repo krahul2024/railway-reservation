@@ -70,7 +70,7 @@ const Header = () => {
 						</span>
 
 						{profile === null && (
-						<div>
+						<div className="mt-1">
 							<NavLink to = {"/register"}
 								className="text-sky-600 font-semibold text-md hover:text-sky-400 cursor-pointer">
 								register</NavLink>

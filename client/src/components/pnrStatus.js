@@ -28,7 +28,8 @@ const PnrStatus = () => {
 		setSuccess(result.success)
 	}
 
-	console.log(status)
+	console.log({status})
+	const base_date = status.date.day.value - status.stations.boarding.day  
 	
 	const cancelTicket = async(e) => {
 		e.preventDefault() 
@@ -102,7 +103,7 @@ const PnrStatus = () => {
 								<th className="px-2 py-3 border-2 text-center border-sky-800 rounded-md">Arrival-Time</th>
 								<th className="px-2 py-3 border-2 text-center border-sky-800 rounded-md">Departure-Time</th>
 								<th className="px-2 py-3 border-2 text-center border-sky-800 rounded-md">Stops for (in minutes)</th>
-								<th className="px-2 py-3 border-2 text-center border-sky-800 rounded-md">Day</th>
+								<th className="px-2 py-3 border-2 text-center border-sky-800 rounded-md">Date</th>
 							</tr>
 							<tbody className="px-4">
 							{ status.train.route.map((route , index) => (
@@ -111,7 +112,7 @@ const PnrStatus = () => {
 									<td className="px-2 py-3 border-2 text-center border-sky-800 rounded-md">{route.arrivalTime}</td>
 									<td className="px-2 py-3 border-2 text-center border-sky-800 rounded-md">{route.departureTime}</td>
 									<td className="px-2 py-3 border-2 text-center border-sky-800 rounded-md">{route.stoppageTime}</td>
-									<td className="px-2 py-3 border-2 text-center border-sky-800 rounded-md">{route.day}</td>
+									<td className="px-2 py-3 border-2 text-center border-sky-800 rounded-md">{base_date + route.day}</td>
 								</tr>
 								) )}
 

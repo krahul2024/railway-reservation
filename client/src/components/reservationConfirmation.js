@@ -33,6 +33,14 @@ const ReservationConfirmation = () => {
 
 	const sendOtp = async(e) => {
 		e.preventDefault() 
+		// if the user is not logged in then prompting user to login first in order to book
+		// the tickets 
+
+		if(!profile){
+			alert('Please login to continue reservation.Thanks')
+			localStorage.setItem('storedResInfo' , JSON.stringify(storedResInfo))
+			navigate('/login')
+		}
 		//sending otp for user authentication 
 		try{
 			const response = await fetch("http://localhost:4000/train/send_otp",{
@@ -69,10 +77,10 @@ const ReservationConfirmation = () => {
 				body:JSON.stringify({
 					otp
 				})
-			})
-			console.log(response) 
+			})  
 
 			const result = await response.json() 
+			alert(result.msg) 
 			if(result.success){
 			 setSent(false) 
 			 setConfirm(true) 
@@ -86,15 +94,7 @@ const ReservationConfirmation = () => {
 	}
 			
 	const processReservation = async (e) => {
-		e.preventDefault() 
-
-		if(!profile){
-			alert('Please login to continue reservation.Thanks')
-			localStorage.setItem('storedResInfo' , JSON.stringify(storedResInfo))
-			navigate('/login')
-		}
-
-		// localStorage.removeItem('storedResInfo') 
+		e.preventDefault()
 		const response = await fetch("http://localhost:4000/user/confirmReservation" , {
 			method:"POST",
 			headers:{
@@ -112,6 +112,7 @@ const ReservationConfirmation = () => {
 		window.alert(result.msg)  
 		if(result.success ) { // in case of successful ticket booking updating user information and redirecting user to print ticket option
 			setProfile(result.user)  
+			localStorage.removeItem('storedResInfo') 
 			navigate("/reservations") 
 		}
 
