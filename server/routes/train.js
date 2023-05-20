@@ -656,11 +656,20 @@ router.post('/cancel_ticket', async (req, res) => {
     // try {
 
 
-    	let ticket = await Ticket.findOne({pnr}) , ticket_group = []
+    	let ticket = await Ticket.findOne({pnr}) , ticket_group = [] 
     	if(!ticket) return res.status(500).send({
     		success:false ,
     		msg:'There is no such ticket with this pnr! Please try again with another valid ticket.'
     	})
+
+        const seat = ticket.seat , train_num = ticket.train.number 
+
+        let train = Train.findOne({number:train_num}) 
+        if(!train) return res.status(500).send({
+            success:false ,
+            msg:'There is no such ticket with this pnr! Please try again with another valid ticket.'
+        })
+
 
     	console.log({ticket}) 
     	let user = await User.findOne({_id:ticket.bookedBy})
@@ -699,6 +708,20 @@ router.post('/cancel_ticket', async (req, res) => {
     		success:false ,
     		msg:'There was an error while cancellation of the ticket! Please try again later.'
     	})
+
+        for(let i=0;i<train.classes.length;i++) {
+            if(ticket.jClass.classType === train.classes[i].classType){ 
+                seats[seat] = false ;
+                break;
+            }
+        }
+
+        train = await train.save() 
+
+        if(!train) return res.status(500).send({
+            success:false ,
+            msg:'There was an error during ticket cancellation! Please try again with another valid ticket.'
+        })
 
     	return res.status(200).send({
     		success:true ,

@@ -29,7 +29,8 @@ const PnrStatus = () => {
 	}
 
 	console.log({status})
-	const base_date = status.date.day.value - status.stations.boarding.day  
+
+	const base_date = status?.date.day.value - status?.stations.boarding.day  
 	
 	const cancelTicket = async(e) => {
 		e.preventDefault() 
