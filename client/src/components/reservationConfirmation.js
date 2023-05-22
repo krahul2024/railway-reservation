@@ -13,10 +13,18 @@ const ReservationConfirmation = () => {
 	const resClass = resInfo.class , distance = resInfo.distance 
 	const users = resInfo.users , quantity = Math.max(users.length , resInfo.quantity) 
 	const date = resInfo.date 
+	const [passes , setPasses] = useState(users)
 	let [storedResInfo , setStoredResInfo] = useState(null)
 	const [otp , setOtp] = useState(null)
 	const [confirm , setConfirm] = useState(false)
 	const [sent , setSent] = useState(false)
+	const [edit , setEdit] = useState(false) 
+	const [idx, setIdx] = useState(-1)
+	const [name , setName] = useState('')
+	const [email ,setEmail] = useState('')
+	const [age , setAge] = useState('') 
+	const [address , setAddress] = useState('')
+	const [phone , setPhone] = useState('')
 
 	console.log({profile})
 	
@@ -132,6 +140,27 @@ const ReservationConfirmation = () => {
 		})
 	}
 
+	const deleteUser = (e , index) => {
+		e.preventDefault() 
+		console.log(users[index])
+
+	}
+
+	const handleChange = (e , index) => {
+		e.preventDefault() 
+		const name = e.target.name , value = e.target.value 
+		// console.log(name , value)
+		let values = [...passes]
+		values[index][name] = value  
+		setPasses(values)
+	}
+
+	const updateSelectedUser = (e , index) => {
+		e.preventDefault() 
+
+
+	}
+
 	if(location.state.resInfo) return (<> 
 
 
@@ -194,49 +223,99 @@ const ReservationConfirmation = () => {
 				</div>
 			</div>
 
-			<div className="flex justify-center ">
-					
-					<div className="w-[700px] md:w-[860px] lg:w-[1020px] xl:w-[1160px] rounded-lg shadow-2xl px-12 py-8">
+				<div className="flex flex-col justify-center items-center mx-12">
+					<span className="px-4 py-1 mt-8 flex justify-items-center text-sky-500 text-lg font-semibold">List of all the passengers</span>
+					<div className="text-blue-600 mt-6 flex justify-items-center">
 						<table className="">
-							<thead className="brightness-200 contrast-100 text-cyan-900 font-semibold text-md shadow-2xl">
-							<tr>
-								<th className="md:px-6 px-2 py-6 text-center">Person No.</th>
-								<th className="md:px-6 px-2 py-6 text-center">Name</th>
-								<th className="md:px-6 px-2 py-6 text-center">Phone</th>
-								<th className="md:px-6 px-2 py-6 text-center">E-mail</th>
-								<th className="md:px-6 px-2 py-6 text-center">Age</th>
-								<th className="md:px-6 px-2 py-6 text-center">Address</th>
+							<tr className="gap-8">
+								<th className="text-center border-sky-800 px-2 py-1.5 rounded-md">Action</th>
+								<th className="text-center border-sky-800 px-2 py-1.5 rounded-md">Name</th>
+								<th className="text-center border-sky-800 px-2 py-1.5 rounded-md">E-mail</th>
+								<th className="text-center border-sky-800 px-2 py-1.5 rounded-md">Phone</th>
+								<th className="text-center border-sky-800 px-2 py-1.5 rounded-md">Address</th>
+								<th className="text-center border-sky-800 px-2 py-1.5 rounded-md">Age</th>
 							</tr>
-							</thead>
+							<tbody className="px-4">
+							{ passes.length>0 && passes.map((user , index) => (
+								<tr index className="hover:brightness-125 hover:backdrop-brightness-125 text-cyan-500 mx-auto">
+									
+									<td className="px-4 py-2 text-center border-sky-800 px-2 py-1.5">
+										{(!edit || idx!== index) && (
+											<div>
+												<button onClick = {(e) => {
+													setEdit(true) 
+													setIdx(index)
+													updateSelectedUser(e,index)
+												}}
+													className="bg-transparent p-2 rounded-lg my-1">edit</button>
+												<button onClick = {(e) => deleteUser(e)}
+													className="bg-transparent p-2 rounded-lg my-1">delete</button>
+											</div>
+										)}
+										{edit && idx === index && (
+											<div>
+												<button onClick = {(e) => {
+													updateSelectedUser(e , index) 
+													setEdit(false) 
+													setIdx(-1)
+												}}
+													className="bg-transparent p-2 rounded-lg my-1">save</button>
+												<button onClick = {(e) => {
+													setEdit(false) 
+													setIdx(-1)
+												}}
+													className="bg-transparent p-2 rounded-lg my-1">cancel</button>
+											</div>
+										)}
+									</td>
 
-							<tbody className="brightness-150 contrast-150 text-indigo-800 text-md backdrop-brightness-100">
-								{ users.map((user ,index) => 
-								<tr className="hover:font-semibold hover:text-cyan-900 hover:shadow-2xl hover:brightness-125 hover:contrast-125 hover:backdrop-blur-xl">
-									<td className="md:px-6 px-2 py-6 text-center">
-										Person {(index+1)}
+									<td className="text-center border-sky-800 px-2 py-1.5 rounded-md">
+										{(!edit || idx!==index) && user.name}
+										{edit && idx===index && (
+											<input type="text" name="name" value = {user.name} onChange = {(e) => handleChange(e , index)}
+												className="w-[180px] border-b-2 bg-transparent border-sky-600 hover:border-indigo-600 outline-0 px-3"/>
+								
+										)}
 									</td>
-									<td className="md:px-6 px-2 py-6 text-center">
-										{user.name}
+									<td className="text-center border-sky-800 px-2 py-1.5 rounded-md">
+										{(!edit || idx!==index) && user.phone}
+										{edit && idx===index && (
+											<input type="text" name="phone" value = {user.phone} onChange = {(e) => handleChange(e ,index)}
+												className="w-[130px] border-b-2 bg-transparent border-sky-600 hover:border-indigo-600 outline-0 px-3"/>
+											
+										)}
 									</td>
-									<td className="md:px-6 px-2 py-6 text-center">
-										{user.phone}
+									<td className="text-center border-sky-800 px-2 py-1.5 rounded-md">
+										{(!edit || idx!==index) && user.email}
+										{edit && idx===index && (
+											<input type="text" name="email" value = {user.email} onChange = {(e) => handleChange(e , index)}
+												className="w-[260px] border-b-2 bg-transparent border-sky-600 hover:border-indigo-600 outline-0 px-3"/>
+											
+										)}
 									</td>
-									<td className="md:px-6 px-2 py-6 text-center">
-										{user.email}
+									<td className="text-center border-sky-800 px-2 py-1.5 rounded-md">
+										{(!edit || idx!==index) && user.address}
+										{edit && idx===index && (
+											<input type="text" name="address" value = {user.address} onChange = {(e) => handleChange(e ,index)} 
+												className="w-[380px] border-b-2 bg-transparent border-sky-600 hover:border-indigo-600 outline-0 px-3"/>
+											
+										)}
 									</td>
-									<td className="md:px-6 px-2 py-6 text-center">
-										{user.age}
-									</td>
-									<td className="md:px-6 px-2 py-6 text-center">
-										{user.address}
+									<td className="text-center border-sky-800 px-2 py-1.5 rounded-md">
+										{(!edit || idx!==index) && user.age}
+										{edit && idx===index && (
+											<input type="text" name="age" value = {user.age} onChange = {(e) => handleChange(e , index)} 
+												className="w-[50px] border-b-2 bg-transparent border-sky-600 hover:border-indigo-600 outline-0 px-3"/>
+											
+										)}
 									</td>
 								</tr>
-								)}
+								) )}
+
 							</tbody>
 						</table>
-						
 					</div>
-
+					
 				</div>
 			</div>
 				<div className="p-8 flex gap-3 flex justify-center text-center shadow-xl backdrop-brightness-105 mt-8">
@@ -260,7 +339,7 @@ const ReservationConfirmation = () => {
 							<div className="md:flex gap-2">
 								{ sent && (
 									<div className="flex gap-2">
-										<input name = "otp" onChange = {(e) => setOtp(e.target.value)}
+										<input name = "otp" onChange  onChange = {(e) => setOtp(e.target.value)}
 											className="p-2.5 bg-transparent border-sky-600 border-2 rounded-lg px-8 hover:border-indigo-600 outline-0 text-indigo-600"
 											type="text"/>
 										<button onClick={(e) => verifyOtp(e) }
