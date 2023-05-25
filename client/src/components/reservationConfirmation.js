@@ -23,12 +23,9 @@ const ReservationConfirmation = () => {
 		name:'',email:'',address:'',phone:'',age:''
 	})
 
-	const [passes , setPasses] = useState(users) 
-
+	const [passes , setPasses] = useState(resInfo.users) 
 	
-
 	useEffect(() => {
-		resInfo.users = passes 
 		setStoredResInfo(resInfo)
 		localStorage.setItem('storedResInfo' , JSON.stringify(storedResInfo))
 	},[storedResInfo])
@@ -123,7 +120,6 @@ const ReservationConfirmation = () => {
 			localStorage.removeItem('storedResInfo') 
 			navigate("/reservations") 
 		}
-
 	}
 
 	//for adding this journey to user's wishlist
@@ -131,7 +127,6 @@ const ReservationConfirmation = () => {
 		e.preventDefault() 
 		console.log("This adding to wishlist of the user.....")
 	}
-
 
 	const generatePdf = () => {
 		const report = new JsPdf('portrait','pt','a2') 
@@ -150,6 +145,7 @@ const ReservationConfirmation = () => {
 	const deleteSelectedUser = (e , index) => {
 		e.preventDefault() 
 		setPasses(prev=> prev.filter((item , id) => index!==id)) 
+		resInfo.users = [...passes]
 	}
 
 	if(location.state.resInfo) return (<> 
@@ -213,7 +209,7 @@ const ReservationConfirmation = () => {
 		<div className="flex flex-col items-center px-4 py-6 gap-y-4">
 			<span className="text-cyan-500 font-semibold text-lg p-4">List of all the passengers</span>
 			<div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-x-6 gap-y-10 flex justify-center">
-				{passes.map((user , index) => (
+				{passes.length>0 && passes.map((user , index) => (
 					<div className="">
 					{ (!edit || idx!==index) && (
 						<div className="flex text-start flex-col border-cyan-900 border rounded-lg px-6 py-3 gap-y-4 bg-transparent text-blue-500 brightness-125">
@@ -265,8 +261,9 @@ const ReservationConfirmation = () => {
 								<button onClick = {(e) => {
 									setEdit(false)
 									setIdx(-1)
-									users[index] = info
-									setPasses(users) 
+									let values = [...passes]  
+									values[index] = info
+									setPasses(values) 
 								}}
 									className="flex gap-2 items-center border-cyan-900 border px-4 py-1 rounded-lg text-sky-500 hover:bg-blue-800 hover:text-black hover:brightness-150"
 									>
