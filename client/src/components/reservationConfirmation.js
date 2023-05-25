@@ -11,32 +11,31 @@ const ReservationConfirmation = () => {
 	const resInfo = location.state.resInfo
 	const train = resInfo.train, stations = resInfo.stations 
 	const resClass = resInfo.class , distance = resInfo.distance 
-	const users = resInfo.users , quantity = Math.max(users.length , resInfo.quantity) 
+	let users = resInfo.users , quantity = Math.max(users.length , resInfo.quantity) 
 	const date = resInfo.date 
-	const [passes , setPasses] = useState(users)
-	let [storedResInfo , setStoredResInfo] = useState(null)
+	const [storedResInfo , setStoredResInfo] = useState(null)
 	const [otp , setOtp] = useState(null)
 	const [confirm , setConfirm] = useState(false)
 	const [sent , setSent] = useState(false)
-	const [edit , setEdit] = useState(false) 
-	const [idx, setIdx] = useState(-1)
-	const [name , setName] = useState('')
-	const [email ,setEmail] = useState('')
-	const [age , setAge] = useState('') 
-	const [address , setAddress] = useState('')
-	const [phone , setPhone] = useState('')
+	const [edit ,setEdit] = useState(false) 
+	const [idx , setIdx] = useState(-1)
+	const [info , setInfo] = useState({
+		name:'',email:'',address:'',phone:'',age:''
+	})
 
-	console.log({profile})
+	const [passes , setPasses] = useState(users) 
+
 	
 
 	useEffect(() => {
+		resInfo.users = passes 
 		setStoredResInfo(resInfo)
 		localStorage.setItem('storedResInfo' , JSON.stringify(storedResInfo))
 	},[storedResInfo])
 	//fetching the stored information about reservation
 	useEffect(() => {
 		let result = JSON.parse(localStorage.getItem('storedResInfo'))
-		console.log('Reservation information',result)  
+		// console.log('Reservation information',result)  
 	})
 
 	const sendOtp = async(e) => {
@@ -73,7 +72,7 @@ const ReservationConfirmation = () => {
 
 	const verifyOtp = async(e) => {
 		e.preventDefault() 
-		console.log(otp)
+		// console.log(otp)
 		// this will be shown in last after successful otp verification 
 		try{
 			const response = await fetch("http://localhost:4000/train/verify_otp",{
@@ -103,6 +102,7 @@ const ReservationConfirmation = () => {
 			
 	const processReservation = async (e) => {
 		e.preventDefault()
+		console.log(resInfo.users) 
 		const response = await fetch("http://localhost:4000/user/confirmReservation" , {
 			method:"POST",
 			headers:{
@@ -116,7 +116,7 @@ const ReservationConfirmation = () => {
 
 		const result = await response.json() 
 		// if(result) //remove reservation information stored in local storage
-		console.log(result)
+		// console.log(result)
 		window.alert(result.msg)  
 		if(result.success ) { // in case of successful ticket booking updating user information and redirecting user to print ticket option
 			setProfile(result.user)  
@@ -140,31 +140,19 @@ const ReservationConfirmation = () => {
 		})
 	}
 
-	const deleteUser = (e , index) => {
-		e.preventDefault() 
-		console.log(users[index])
-
-	}
-
-	const handleChange = (e , index) => {
-		e.preventDefault() 
+	const handleInfoChange = (e) => {
+		e.preventDefault()
 		const name = e.target.name , value = e.target.value 
-		// console.log(name , value)
-		let values = [...passes]
-		values[index][name] = value  
-		setPasses(values)
+		// console.log(name, value)
+		setInfo({...info , [name]:value})
 	}
 
-	const updateSelectedUser = (e , index) => {
+	const deleteSelectedUser = (e , index) => {
 		e.preventDefault() 
-
-
+		setPasses(prev=> prev.filter((item , id) => index!==id)) 
 	}
 
 	if(location.state.resInfo) return (<> 
-
-
-		<div id="printableSection">
 		 <div>
 			<div className="shadow-xl rounded-lg brightness-125 font-bold text-xl text-cyan-600 flex justify-center p-4">
 				<span className="mt-12">Your Journey Details</span>
@@ -221,103 +209,90 @@ const ReservationConfirmation = () => {
 							>{`${date.day.value} ${date.month.name} ${date.year}, ${stations.boarding.arrivalTime}`}</span>
 					</div>
 				</div>
-			</div>
+		</div>
+		<div className="flex flex-col items-center px-4 py-6 gap-y-4">
+			<span className="text-cyan-500 font-semibold text-lg p-4">List of all the passengers</span>
+			<div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-x-6 gap-y-10 flex justify-center">
+				{passes.map((user , index) => (
+					<div className="">
+					{ (!edit || idx!==index) && (
+						<div className="flex text-start flex-col border-cyan-900 border rounded-lg px-6 py-3 gap-y-4 bg-transparent text-blue-500 brightness-125">
+							<span className="mb-2">Person {index+1}</span>
+							<span className="mt-6 bg-transparent px-4 py-1.5 ">{user.name}</span>
+							<span className="bg-transparent px-4 py-1.5">{user.email}</span>
+							<span className="bg-transparent px-4 py-1.5">{user.phone}</span>
+							<span className="bg-transparent px-4 py-1.5">{user.address}</span>
+							<span className="bg-transparent px-4 py-1.5">{user.age} Years</span>
+							<div className="flex justify-center gap-4">
+								<button onClick = {(e) => {
+									setEdit(true)
+									setIdx(index)
+									!edit && setInfo(user) 
+								}}
+									className="flex gap-2 items-center border-cyan-900 border px-4 py-1 rounded-lg text-sky-500 hover:bg-blue-800 hover:text-black hover:brightness-150"
+									>
+									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-6">
+									  <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+									</svg>
+										Edit</button>
+								<button onClick = {(e) => {
+									window.confirm('Are you sure to delete this user?') && deleteSelectedUser(e , index)  
+								}}
+									className="flex gap-2 items-center border-cyan-900 border px-4 py-1 rounded-lg text-sky-500 hover:bg-blue-800 hover:text-black hover:brightness-150"
+									>
+									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.4} stroke="currentColor" className="w-6 h-5">
+									  <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+									</svg>
+										Delete</button>
+							</div>
+						</div>
+					)}
 
-				<div className="flex flex-col justify-center items-center mx-12">
-					<span className="px-4 py-1 mt-8 flex justify-items-center text-sky-500 text-lg font-semibold">List of all the passengers</span>
-					<div className="text-blue-600 mt-6 flex justify-items-center">
-						<table className="">
-							<tr className="gap-8">
-								<th className="text-center border-sky-800 px-2 py-1.5 rounded-md">Action</th>
-								<th className="text-center border-sky-800 px-2 py-1.5 rounded-md">Name</th>
-								<th className="text-center border-sky-800 px-2 py-1.5 rounded-md">E-mail</th>
-								<th className="text-center border-sky-800 px-2 py-1.5 rounded-md">Phone</th>
-								<th className="text-center border-sky-800 px-2 py-1.5 rounded-md">Address</th>
-								<th className="text-center border-sky-800 px-2 py-1.5 rounded-md">Age</th>
-							</tr>
-							<tbody className="px-4">
-							{ passes.length>0 && passes.map((user , index) => (
-								<tr index className="hover:brightness-125 hover:backdrop-brightness-125 text-cyan-500 mx-auto">
-									
-									<td className="px-4 py-2 text-center border-sky-800 px-2 py-1.5">
-										{(!edit || idx!== index) && (
-											<div>
-												<button onClick = {(e) => {
-													setEdit(true) 
-													setIdx(index)
-													updateSelectedUser(e,index)
-												}}
-													className="bg-transparent p-2 rounded-lg my-1">edit</button>
-												<button onClick = {(e) => deleteUser(e)}
-													className="bg-transparent p-2 rounded-lg my-1">delete</button>
-											</div>
-										)}
-										{edit && idx === index && (
-											<div>
-												<button onClick = {(e) => {
-													updateSelectedUser(e , index) 
-													setEdit(false) 
-													setIdx(-1)
-												}}
-													className="bg-transparent p-2 rounded-lg my-1">save</button>
-												<button onClick = {(e) => {
-													setEdit(false) 
-													setIdx(-1)
-												}}
-													className="bg-transparent p-2 rounded-lg my-1">cancel</button>
-											</div>
-										)}
-									</td>
-
-									<td className="text-center border-sky-800 px-2 py-1.5 rounded-md">
-										{(!edit || idx!==index) && user.name}
-										{edit && idx===index && (
-											<input type="text" name="name" value = {user.name} onChange = {(e) => handleChange(e , index)}
-												className="w-[180px] border-b-2 bg-transparent border-sky-600 hover:border-indigo-600 outline-0 px-3"/>
-								
-										)}
-									</td>
-									<td className="text-center border-sky-800 px-2 py-1.5 rounded-md">
-										{(!edit || idx!==index) && user.phone}
-										{edit && idx===index && (
-											<input type="text" name="phone" value = {user.phone} onChange = {(e) => handleChange(e ,index)}
-												className="w-[130px] border-b-2 bg-transparent border-sky-600 hover:border-indigo-600 outline-0 px-3"/>
-											
-										)}
-									</td>
-									<td className="text-center border-sky-800 px-2 py-1.5 rounded-md">
-										{(!edit || idx!==index) && user.email}
-										{edit && idx===index && (
-											<input type="text" name="email" value = {user.email} onChange = {(e) => handleChange(e , index)}
-												className="w-[260px] border-b-2 bg-transparent border-sky-600 hover:border-indigo-600 outline-0 px-3"/>
-											
-										)}
-									</td>
-									<td className="text-center border-sky-800 px-2 py-1.5 rounded-md">
-										{(!edit || idx!==index) && user.address}
-										{edit && idx===index && (
-											<input type="text" name="address" value = {user.address} onChange = {(e) => handleChange(e ,index)} 
-												className="w-[380px] border-b-2 bg-transparent border-sky-600 hover:border-indigo-600 outline-0 px-3"/>
-											
-										)}
-									</td>
-									<td className="text-center border-sky-800 px-2 py-1.5 rounded-md">
-										{(!edit || idx!==index) && user.age}
-										{edit && idx===index && (
-											<input type="text" name="age" value = {user.age} onChange = {(e) => handleChange(e , index)} 
-												className="w-[50px] border-b-2 bg-transparent border-sky-600 hover:border-indigo-600 outline-0 px-3"/>
-											
-										)}
-									</td>
-								</tr>
-								) )}
-
-							</tbody>
-						</table>
-					</div>
+					{ edit && idx===index && (
+						<div className="flex flex-col border-cyan-900 border rounded-lg px-6 py-3 gap-y-4 bg-transparent text-blue-500 brightness-125">
+							<span className="mb-2">Person {index+1}</span>
+							<input type="text" value={info.name} name="name" onChange = {(e) => handleInfoChange(e)}
+							 className="mt-2 outline-0 bg-transparent border-b border-sky-600 hover:border-indigo-600 px-4 py-1.5 w-[300px]"/>
+							<input type="text" value={info.email} name="email" onChange = {(e) => handleInfoChange(e)}
+							 className="outline-0 bg-transparent border-b border-sky-600 hover:border-indigo-600 px-4 py-1.5 w-[300px]"/>
+							<input type="text"  value={info.phone} name="phone" onChange = {(e) => handleInfoChange(e)}
+							 className="outline-0 bg-transparent border-b border-sky-600 hover:border-indigo-600 px-4 py-1.5 w-[170px]"/>
+							<textarea type="text"  value={info.address} name="address" onChange = {(e) => handleInfoChange(e)}
+							 className="outline-0 flex justify-start bg-transparent border-b border-sky-600 hover:border-indigo-600 px-4 py-1.5 w-auto"/>
+							<input type="text"  value={info.age} name="age" onChange = {(e) => handleInfoChange(e)}
+							 className="outline-0 bg-transparent border-b border-sky-600 hover:border-indigo-600 px-4 py-1.5 w-[70px]"/>
+							<div className="flex justify-center gap-4 mt-3 mb-1">
+								<button onClick = {(e) => {
+									setEdit(false)
+									setIdx(-1)
+									users[index] = info
+									setPasses(users) 
+								}}
+									className="flex gap-2 items-center border-cyan-900 border px-4 py-1 rounded-lg text-sky-500 hover:bg-blue-800 hover:text-black hover:brightness-150"
+									>
+									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+									  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+									</svg>
+									Save</button>
+								<button onClick = {(e) => {
+									setEdit(false)
+									setIdx(-1)
+								}}
+									className="flex gap-2 items-center border-cyan-900 border px-4 py-1 rounded-lg text-sky-500 hover:bg-blue-800 hover:text-black hover:brightness-150"
+									>
+									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-6">
+									  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+									</svg>
+									Cancel</button>
+							</div>
+						</div>
+					)}
 					
-				</div>
+					</div>
+
+				))}
 			</div>
+		</div>
 				<div className="p-8 flex gap-3 flex justify-center text-center shadow-xl backdrop-brightness-105 mt-8">
 					{confirm && (
 						<div className="flex gap-3">
@@ -341,7 +316,8 @@ const ReservationConfirmation = () => {
 									<div className="flex gap-2">
 										<input name = "otp" onChange  onChange = {(e) => setOtp(e.target.value)}
 											className="p-2.5 bg-transparent border-sky-600 border-2 rounded-lg px-8 hover:border-indigo-600 outline-0 text-indigo-600"
-											type="text"/>
+											type="text" 
+											 className="outline-0 bg-transparent border-b border-sky-600 hover:border-indigo-600 px-4 w-full py-1"/>
 										<button onClick={(e) => verifyOtp(e) }
 											className="rounded-lg shadow-2xl border-2 px-4 py-2 hover:border-transparent hover:border-cyan-900 hover:brightness-150 text-cyan-500 text-lg hover:bg-blue-600 hover:text-black hover:font-semibold hover:shadow-2xl border-cyan-700">
 											Verify OTP</button>
