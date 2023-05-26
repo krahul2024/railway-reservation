@@ -148,11 +148,11 @@ router.get("/train_list", async (req, res) => {
 })
 
 // router.get("/exp" , async(req,res) => {
-// 	let trains = await Train.find({})  
-// 	for(let i=0;i<trains.length;i++){
-// 		trains[i].runningDays.sort((a,b) => a.index > b.index ? 1: -1)
-// 		await trains[i].save()
-// 	}
+//  let trains = await Train.find({})  
+//  for(let i=0;i<trains.length;i++){
+//      trains[i].runningDays.sort((a,b) => a.index > b.index ? 1: -1)
+//      await trains[i].save()
+//  }
 // })
 
 
@@ -285,14 +285,14 @@ router.post("/add_train", async (req, res) => {
         train = await train.save()
         console.log(train)
 
-        // 	if(!train) throw error 
+        //  if(!train) throw error 
 
-        // 	return res.status(200).send({
-        // 		success:true,
-        // 		msg:"Train added successfully!",
-        // 		toPath:"/train_list",
-        // 		train
-        // 	})
+        //  return res.status(200).send({
+        //      success:true,
+        //      msg:"Train added successfully!",
+        //      toPath:"/train_list",
+        //      train
+        //  })
     } catch (error) {
         // console.log("There was an error! Please try again later.")
         console.log(error)
@@ -417,8 +417,8 @@ router.post("/update_train", async (req, res) => {
         let trains = await Train.find({})
 
         // if(!train) return res.status(400).send({
-        // 	success:false,
-        // 	msg:"No such train exists"
+        //  success:false,
+        //  msg:"No such train exists"
         // })
         trains.map((train) => {
             const route = train.route
@@ -437,7 +437,7 @@ router.post("/update_train", async (req, res) => {
                 else curr_day = prev_day, route[i].day = curr_day
             }
             // route.map((item) => {
-            // 	console.log(item.day) 
+            //  console.log(item.day) 
             // })
             train.runningDays.sort()
             train = train.save()
@@ -585,8 +585,8 @@ router.post('/send_otp', auth, async (req, res) => {
     try {
         let { user } = req, { email } = user, otp_value = Math.floor(Math.random() * 100000),
             message = `
-			<h3>OTP for ticket booking is ${otp_value}</h3>
-			`, otp_response = await sendMail(email, message)
+            <h3>OTP for ticket booking is ${otp_value}</h3>
+            `, otp_response = await sendMail(email, message)
 
         // console.log({otp_response} , {user} , {otp_value})
 
@@ -604,7 +604,7 @@ router.post('/send_otp', auth, async (req, res) => {
             })
         }
 
-        console.log({user}) 
+        console.log({ user })
         return res.status(200).send({
             msg: 'OTP sent to the email of registered user. Please check spam folder if message not present in inbox. Thanks.',
             success: true
@@ -620,8 +620,8 @@ router.post('/send_otp', auth, async (req, res) => {
 router.post('/verify_otp', auth, async (req, res) => {
     try {
         let { user } = req, { otp } = req.body
-        console.log(user) 
-        console.log(otp , user.otp)
+        console.log(user)
+        console.log(otp, user.otp)
 
         if (otp != user.otp) return res.status(403).send({
             success: false,
@@ -655,78 +655,74 @@ router.post('/cancel_ticket', async (req, res) => {
 
     // try {
 
+    // finding all concerned parties which need modification
 
-    	let ticket = await Ticket.findOne({pnr}) , ticket_group = [] 
-    	if(!ticket) return res.status(500).send({
-    		success:false ,
-    		msg:'There is no such ticket with this pnr! Please try again with another valid ticket.'
-    	})
+    let ticket = await Ticket.findOne({ pnr }),
+        pnr_value = await Pnr.findOne({ pnr })
+    if (!ticket || !pnr_value) return res.status(400).send({
+        success: false,
+        msg: 'No such ticket exists! Please enter valid PNR.'
+    })
 
-        const seat = ticket.seat , train_num = ticket.train.number 
+    let train = await Train.findOne({ number: ticket.train.number }),
+        user = await User.findOne({ _id: ticket.bookedBy })
+    if (!train || !user) return res.status(400).send({
+        success: false,
+        msg: 'There was an error! Please try again later.'
+    })
 
-        let train = Train.findOne({number:train_num}) 
-        if(!train) return res.status(500).send({
-            success:false ,
-            msg:'There is no such ticket with this pnr! Please try again with another valid ticket.'
-        })
+    // now we delete the pnr from list of pnrs first 
+    pnr_value = await Pnr.deleteOne({ pnr })
+    if (!pnr_value) return res.status(400).send({
+        success: false,
+        msg: 'There was an error during cancellation! Please try again later.'
+    })
 
+    // we have successfully deleted the pnr from list of pnrs 
+    // we need to delete the ticket  now 
+    ticket = await Ticket.deleteOne({ pnr })
+    if (!ticket) return res.status(400).send({
+        success: false,
+        msg: 'There was an error during cancellation! Please try again later.'
+    })
 
-    	console.log({ticket}) 
-    	let user = await User.findOne({_id:ticket.bookedBy})
-    	if(!user) return res.status(500).send({
-    		success:false ,
-    		msg:'There was an error while cancellation of the ticket! Please try again later.'
-    	})
-
-    	// now we have to go to the ticket matching with given pnr and label it as cancelled
-    	for(let i=0;i<user.reservations.length;i++){
-    		if(ticket.createdAt === user.reservations[i][0].createdAt) 
-    				ticket_group = user.reservations[i]
-    	}
-
-    	console.log({ticket_group})
-    	ticket_group.map((item , index) => {
-    		if(item.pnr === pnr) item.status = 'Cancelled'
-    		else item.status = 'Not Cancelled'
-    	})
-
-    	for(let i=0;i<user.reservations.length;i++){
-    		if(ticket.createdAt === user.reservations[i][0].createdAt)
-    			user.reservations[i] = ticket_group 
-    	}
-    	// now we have to find the train and set seat number to false as the ticket is cancelled now
-    	
-    	user = await user.save() 
-    	console.log({user})
-    	if(!user) return res.status(500).send({
-    		success:false ,
-    		msg:'There was an error while cancellation of the ticket! Please try again later.'
-    	})
-
-    	ticket = await Ticket.deleteOne({pnr}) 
-    	if(!ticket) return res.status(500).send({
-    		success:false ,
-    		msg:'There was an error while cancellation of the ticket! Please try again later.'
-    	})
-
-        for(let i=0;i<train.classes.length;i++) {
-            if(ticket.jClass.classType === train.classes[i].classType){ 
-                seats[seat] = false ;
-                break;
+    // so far we have deleted ticket and pnr , now we need to change status of the train
+    for (let i = 0; i < train.classes.length; i++) {
+        if (train.classes[i].classType === ticket.jClass.classType) {
+            train.classes[i].seats[ticket.seat] = false
+            break;
+        } else continue
+    }
+    train = await train.save()
+    if (!train) return res.status(400).send({
+        success: false,
+        msg: 'Your ticket was cancelled successfully! See you again.'
+    })
+    // now only change left is to update user reservations 
+    let found = false
+    for (let i = 0; i < user.reservations.length; i++) {
+        if (user.reservations[i][0].createdAt === ticket.createdAt) {
+            // we have found a match for our ticket
+            for (let j = 0; i < user.reservations[i].length; j++) {
+                if (user.reservations[i][j].pnr === ticket.pnr) {
+                    user.reservations[i][j].status = 'Cancelled'
+                    found = true
+                    break;
+                }
             }
         }
+        if (found) break
+    }
+    user = await user.save()
+    if (!user) return status(200).send({
+        success: false,
+        msg: 'Your ticket was cancelled successfully! See you soon'
+    })
 
-        train = await train.save() 
-
-        if(!train) return res.status(500).send({
-            success:false ,
-            msg:'There was an error during ticket cancellation! Please try again with another valid ticket.'
-        })
-
-    	return res.status(200).send({
-    		success:true ,
-    		msg:'Ticket cancellation was successful.'
-    	})
+    return res.status(200).send({
+        msg: 'Ticket cancellation successful! ',
+        success: true,
+    })
 
 
 

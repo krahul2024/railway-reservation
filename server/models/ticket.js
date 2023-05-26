@@ -27,7 +27,8 @@ const ticketSchema = new mongoose.Schema({
 	jClass:{},
 	distance:Number,
 	stations:{},
-	seat:Number 
+	seat:Number, 
+	status:String
 
 })
 
