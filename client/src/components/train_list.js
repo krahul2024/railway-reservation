@@ -69,14 +69,35 @@ const TrainList  = (props) => {
 		}
 			 	 let at = last.arrivalTime.split(':') , bt = first.departureTime.split(':') 
 		// updating all the values for sorting 
-		 	trainsList[i].aTime = parseInt(at[0]) * 60 +  parseInt(at[1]) 
-		 		trainsList[i].bTime = parseInt(bt[0]) * 60 +  parseInt(bt[1])
-		 		 trainsList[i].jTime =( parseInt(at[0]) - parseInt(bt[0]) + (last.day - first.day)*24 ) * 60 +  parseInt(at[1]) - parseInt(bt[1])
-		 		 trainsList[i].days = days  
+		 	aTime = parseInt(at[0]) * 60 + parseInt(at[1])
+		 	bTime = parseInt(bt[0]) * 60 + parseInt(bt[1])
+		 	if(first.day===last.day) jTime = aTime - bTime 
+		 	else if(first.day !== last.day) {
+		 		console.log(first.day , last.day)
+		 		jTime = aTime - bTime + 1440*(parseInt(last.day) - parseInt(first.day))
+		 	}
+
+		 	trainsList[i].aTime = aTime 
+		 	trainsList[i].bTime = bTime 
+		 	trainsList[i].jTime = jTime
 	}
 
-	if(order)trainsList.sort((a,b) => a.criteria < b.criteria ? 1 : -1) 
-	else if(!order)trainsList.sort((a,b) => a.criteria > b.criteria ? 1 : -1) 
+	if(criteria === 'jTime'){
+		order && trainsList.sort((a,b) => a.jTime - b.jTime) 
+		!order && trainsList.sort((a,b) => a.jTime - b.jTime) 
+	}
+	if(criteria === 'aTime'){
+		order && trainsList.sort((a,b) => a.aTime - b.aTime) 
+		!order && trainsList.sort((a,b) => b.aTime - a.aTime) 
+	}
+	if(criteria === 'bTime'){
+		order && trainsList.sort((a,b) => a.bTime - b.bTime) 
+		!order && trainsList.sort((a,b) => b.bTime - a.bTime) 
+	}
+
+	
+	for(let i=0;i<trainsList.length;i++)
+		console.log(trainsList[i].aTime, trainsList[i].bTime,trainsList[i].jTime)
 
 	// console.log({trainsList})
 
@@ -102,12 +123,12 @@ const TrainList  = (props) => {
 					<option value="jTime" className="bg-slate-900 border-sky-700 text-sky-500 text-md hover:text-indigo-500">Journey Time</option>
 				</select>
 
-				<select name="order" onChange = { (e) => setOrder(e.target.value) }
+				{/*<select name="order" onChange = { (e) => setOrder(e.target.value) }
 					className="flex justify-center outline-0 border-2 border-sky-600 bg-transparent px-4 py-1.5 rounded-md text-sky-500 text-md ">
 					<option value={true} disabled selected className="bg-slate-900 border-sky-700 text-sky-500 text-md hover:text-indigo-500 ">Select Order</option>
 					<option value={true}  className="bg-slate-900  border-sky-700 text-sky-500 text-md hover:text-indigo-500 hover:bg-transparent">Ascending</option>
 					<option value={false} className="bg-slate-900  border-sky-700 text-sky-500 text-md hover:text-indigo-500">Descending</option>
-				</select>
+				</select>*/}
 			</div>
 		</div>
 
