@@ -15,6 +15,9 @@ import Header from './components/header.js'
 import {UserContextProvider , UserContext } from './userContext.js'
 import Tickets from './components/tickets.js'
 import PnrStatus from './components/pnrStatus.js'
+import AddClass from './components/add_class.js'
+import AddStation from './components/add_station.js'
+import Information from './components/information.js'
 
 function App() {
   return ( <>
@@ -27,7 +30,10 @@ function App() {
         <Routes>
 
           <Route exact path = "/" element = { <Home /> } />
-          <Route path = "/add_train" element = { <AddTrain /> } />  
+          <Route path = "/add_train" element = { <AddTrain /> } />
+          <Route path = "/info" element = { <Information /> } />   
+          <Route path = "/add_class"  element = { <AddClass /> } />
+          <Route path = "/add_station" element = { <AddStation /> } /> 
           <Route path = "/train_details" element = { <TrainDetails />} /> 
           <Route path = "/train_list" element = { <TrainList /> } />
           <Route path = "/reservation_details"  element = { <ReservationDetails /> } />

@@ -162,37 +162,37 @@ router.get("/train_list", async (req, res) => {
 
 //-------------------------For adding stations -----------------------------
 router.post("/add_station", async (req, res) => {
-    // console.log(req.body)
+    console.log(req.body)
 
-    try {
-        const { name, code, address } = req.body
-        let station = await Station.findOne({ code })
-        if (station) return res.status(400).send({
-            success: false,
-            msg: "This code is given to another station.\n You can update station details with this code.",
-            toPath: "/update_station"
-        })
-        let new_station = new Station({
-            name,
-            code,
-            address
-        })
+    // try {
+    //     const { name, code, address } = req.body
+    //     let station = await Station.findOne({ code })
+    //     if (station) return res.status(400).send({
+    //         success: false,
+    //         msg: "This code is given to another station.\n You can update station details with this code.",
+    //         toPath: "/update_station"
+    //     })
+    //     let new_station = new Station({
+    //         name,
+    //         code,
+    //         address
+    //     })
 
-        new_station = await new_station.save()
-        if (!new_station) throw err
-        return res.status(200).send({
-            success: true,
-            msg: "Station added successfully!",
-            toPath: "/station_list",
-            station: new_station
-        })
-    } catch (err) {
-        // // console.log(err) 
-        return res.status(400).send({
-            success: false,
-            msg: "There was an error!\nPlease try again later..."
-        })
-    }
+    //     new_station = await new_station.save()
+    //     if (!new_station) throw err
+    //     return res.status(200).send({
+    //         success: true,
+    //         msg: "Station added successfully!",
+    //         toPath: "/station_list",
+    //         station: new_station
+    //     })
+    // } catch (err) {
+    //     // // console.log(err) 
+    //     return res.status(400).send({
+    //         success: false,
+    //         msg: "There was an error!\nPlease try again later..."
+    //     })
+    // }
 })
 
 router.get("/exp", async (req, res) => {
@@ -206,39 +206,39 @@ router.get("/exp", async (req, res) => {
 
 //----------------------For adding classes----------------------------------
 router.post("/add_class", async (req, res) => {
-    // console.log(req.body) 
+    console.log(req.body) 
 
-    try {
-        const { classType, fairRatio, totalSeats } = req.body
+    // try {
+    //     const { classType, fairRatio, totalSeats } = req.body
 
-        let result = await Class.findOne({ classType })
-        // console.log(result)
-        if (result) return res.send({
-            success: false,
-            msg: "This class already exists!  Please try with another name",
-            topath: "/add_class"
-        })
-        result = new Class({
-            classType,
-            fareRatio,
-            totalSeats
-        })
-        result = await result.save()
-        // console.log(result)
-        if (!result) throw err
-        return res.status(200).send({
-            success: true,
-            msg: "Class added successfully!",
-            toPath: "/class_list",
-            class: result
-        })
-    } catch (err) {
-        // console.log(err)
-        return res.status(400).send({
-            success: false,
-            msg: "There was an error! Please try again later..."
-        })
-    }
+    //     let result = await Class.findOne({ classType })
+    //     // console.log(result)
+    //     if (result) return res.send({
+    //         success: false,
+    //         msg: "This class already exists!  Please try with another name",
+    //         topath: "/add_class"
+    //     })
+    //     result = new Class({
+    //         classType,
+    //         fareRatio,
+    //         totalSeats
+    //     })
+    //     result = await result.save()
+    //     // console.log(result)
+    //     if (!result) throw err
+    //     return res.status(200).send({
+    //         success: true,
+    //         msg: "Class added successfully!",
+    //         toPath: "/class_list",
+    //         class: result
+    //     })
+    // } catch (err) {
+    //     // console.log(err)
+    //     return res.status(400).send({
+    //         success: false,
+    //         msg: "There was an error! Please try again later..."
+    //     })
+    // }
 })
 
 //-----------------------For adding trains--------------------------------------
