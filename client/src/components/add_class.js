@@ -1,11 +1,14 @@
 import React , {useState , useEffect } from 'react'
-import {NavLink , useNavigate } from 'react-router-dom'
+import {NavLink , useNavigate , useLocation } from 'react-router-dom'
 
 const AddClass = () => {
 	const navigate = useNavigate()
-	const [classType , setClassType] = useState('')
-	const [fairRatio , setFairRatio] = useState('')
-	const [totalSeats , setTotalSeats] = useState('') 
+	const location = useLocation() 
+	const classItem = location?.state?.class 
+	const id = classItem?._id
+	const [classType , setClassType] = useState(classItem?.classType || '')
+	const [fairRatio , setFairRatio] = useState(classItem?.fairRatio || '')
+	const [totalSeats , setTotalSeats] = useState(classItem?.totalSeats || '') 
 
 	const addClass = async(e) => {
 				e.preventDefault() 
@@ -18,7 +21,7 @@ const AddClass = () => {
 					"Content-Type":"application/json"
 				},
 				body:JSON.stringify({
-					classType , fairRatio , totalSeats
+					id,classType , fairRatio , totalSeats
 				})
 			})
 
@@ -27,6 +30,7 @@ const AddClass = () => {
 			console.log(result) 
 			if(!result.success) throw new Error(result.msg)
 			alert('Class added successfully')
+			navigate("/info")
 
 		}
 		catch(error) {
@@ -77,8 +81,8 @@ const AddClass = () => {
 				<div className="flex items-start mt-5 gap-4 items-center justify-center">
 					<button onClick = { (e) => addClass(e)}
 						className="flex items-center cursor-pointer px-16 py-1.5 border border-sky-900 hover:border-transparent hover:bg-blue-800 hover:text-gray-900 font-semibold text-sky-700 rounded-full w-fit"
-						>Add</button>
-					<NavLink to="/"
+						>{classItem?'Update':'Add'}</button>
+					<NavLink to="/info"
 						className="flex items-center cursor-pointer px-16 py-1.5 border border-sky-900 hover:border-transparent hover:bg-blue-800 hover:text-gray-900 font-semibold text-sky-700 rounded-full w-fit"
 						>Cancel</NavLink>
 				</div>

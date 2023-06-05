@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser'
 import auth from '../middlewares/auth.js'
 import sendMail from './mail.js'
 import get_html from './html.js'
+import get_hash from './hash.js'
 const router = express.Router()
 
 router.use(cookieParser())
@@ -52,7 +53,7 @@ router.post("/register", async (req, res) => {
         user = new User({
             name,
             username,
-            password
+            password:get_hash(password)
         })
 
         user = await user.save()
@@ -91,17 +92,17 @@ router.post("/login", async (req, res) => {
             toPath: "/register"
         })
 
-        else if (user.password !== password) return res.status(403).send({
+        else if (user.password !== get_hash(password)) return res.status(403).send({
             success: false,
             msg: "Incorrect Password! Please try entering correct password",
             toPath: "/login",
             user: {
                 username,
-                password
+                password:null
             }
         })
 
-        else if (user.password === password) {
+        else if (user.password === get_hash(password)) {
 
             const token = await createToken(user._id)
 
@@ -329,6 +330,16 @@ router.post("/confirmReservation", auth, async (req, res) => {
         })
     }
 
+})
+
+router.get('/refresh_user' , async(req,res) => {
+    let users = await User.find({})
+    for(let i=0;i<users.length;i++){
+        let user = users[i] 
+        // user.isAdmin = true 
+        // user.password = get_hash(user.password) 
+        user = await user.save() 
+    }
 })
 
 router.post("/logout", auth, async (req, res) => {

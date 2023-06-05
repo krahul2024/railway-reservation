@@ -56,6 +56,13 @@ const Header = () => {
 					</NavLink>
 
 					<div className="flex gap-3 md:gap-4 lg:gap-8 py-1">
+						{profile && profile.isAdmin && (
+						<div className="mt-1">
+							<NavLink to="/info"
+								className="text-sky-600 font-semibold text-md hover:text-sky-400 cursor-pointer">Management</NavLink>
+						</div>
+						)}
+
 						<div className="mt-1">
 							<NavLink to="/pnr-status"
 								className="text-sky-600 font-semibold text-md hover:text-sky-400 cursor-pointer">PNR-Status</NavLink>

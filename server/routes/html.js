@@ -70,9 +70,9 @@ const get_html = (users , ticket) => {
         </div>
       </div>
       <br><br>
-      <span>If you want to cancel the ticket visit homepage --> cancel ticket , then enter your pnr number an d select cancel the ticket, after that you will recieve an otp on the email which the ticket was booked , enter valid otp and click on confirm cancellation, after that same email should recieve a message of ticket cancellation, OR click on the link given below for going to homepage. Thanks.</span>
+      <span>If you want to cancel the ticket visit homepage --> PNR-status , then enter your pnr number an d select cancel the ticket, after that you will recieve an otp on the email which the ticket was booked , enter valid otp and click on confirm cancellation, after that same email should recieve a message of ticket cancellation, OR click on the link given below for going to PNR-status page. Thanks.</span>
       <br><br>
-      <a href="http://localhost:3000/" target="__blank">Click Here</a>
+      <a href="http://localhost:3000/pnr-status" target="__blank">Click Here</a>
     </div>
 `
 

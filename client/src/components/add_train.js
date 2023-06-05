@@ -1,20 +1,28 @@
 import React , {useState  ,useEffect} from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate , useLocation } from 'react-router-dom'
 
 const AddTrain = () => {
 //------------------basic information about the server url and variable declaration for various inputs------------------------------------------------
 	const baseUrl = "http://localhost:4000"
+	const location = useLocation()
+	const navigate = useNavigate()
+	const train_details = location?.state?.train 
 
 	let [train , setTrain] = useState({
-		name:"eg. Patna - Guwahati express" , number:"eg. 13054"
+		name:train_details?.name||"eg. Patna - Guwahati express" ,
+		 number:train_details?.number || "eg. 13054"
 	})
-	const [run , setRun] = useState([]) // this is for list of days on which the train is running
 
-	const [classInput, setClassInput] = useState([{
-		classType:"AC-2",totalSeats:50,fareRatio:4,show:true
+	const [run , setRun] = useState(train_details?.runninDays || []) // this is for list of days on which the train is running
+
+	const classes = train_details?.classes
+	const [classInput, setClassInput] = useState(classes?classes:[{
+		classType:"AC-2",totalSeats:50,fairRatio:4,show:true
 	}])
 
-	const [routeInput, setRouteInput] = useState([{
+	const routes = train_details?.route  
+
+	const [routeInput, setRouteInput] = useState(routes?routes:[{
 		stationName:"Patna",
 		arrivalTime:"22:45" ,
 		 stoppageTime:0,
@@ -22,6 +30,7 @@ const AddTrain = () => {
 		 show:true,
 		 stationCode:"PNB"
 	}]) 
+
 
 	
 //---------------------------setting/handling inputs recieved from user---------------------------------------------
@@ -87,13 +96,15 @@ const AddTrain = () => {
 					number:train.number,
 					classes:classInput,
 					route:routeInput , 
-					runningDays:run  
+					runningDays:run  ,
+					id:train_details?._id
 			})
 		})
 
 		const data = await response.json() 
 		console.log(data) 
 		window.alert(data.msg)
+		if(data.success) navigate('/info')
 	}
 
 //----------------fetching list of stations and classes and showing classes and stations suggestions -------------------------------------
@@ -224,7 +235,7 @@ const AddTrain = () => {
 
 	return ( <> 
 
-		<div className="p-4 flex justify-center mt-12 ">
+		<div className="p-4 flex justify-center mt-4 scale-90">
 
 			<form method="post" className="p-2 rounded-lg">
 {/*-------------------------This section contains headings and a subheading --------------------------------------*/}
@@ -473,9 +484,9 @@ const AddTrain = () => {
 				<div className="flex items-center justify-center gap-12">
 					<button onClick={sendTrainData} 
 						className="px-3 py-2 bg-cyan-900 hover:bg-cyan-800 rounded-full shadow-lg w-[200px] "
-						>Add Train</button>
+						>{train_details?'Update Train':'Add Train'}</button>
 
-					<NavLink to={"/"} 
+					<NavLink to={"/info"} 
 						className="px-3 py-2 bg-blue-900 hover:bg-blue-800 rounded-full shadow-lg w-[200px] text-center"
 						>Cancel</NavLink>
 				</div>

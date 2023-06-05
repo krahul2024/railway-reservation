@@ -164,35 +164,40 @@ router.get("/train_list", async (req, res) => {
 router.post("/add_station", async (req, res) => {
     console.log(req.body)
 
-    // try {
-    //     const { name, code, address } = req.body
-    //     let station = await Station.findOne({ code })
-    //     if (station) return res.status(400).send({
-    //         success: false,
-    //         msg: "This code is given to another station.\n You can update station details with this code.",
-    //         toPath: "/update_station"
-    //     })
-    //     let new_station = new Station({
-    //         name,
-    //         code,
-    //         address
-    //     })
+    try {
+        const { id, name, code, address } = req.body
+        let station = await Station.findOne({ _id: id })
+        if (station) {
+            station.name = name, station.code = code, station.address = address
+            station = await station.save()
+            if (!station) throw err
+            return res.status(200).send({
+                success: true,
+                msg: "Station Updated successfully!",
+                station
+            })
+        }
+        let new_station = new Station({
+            name,
+            code,
+            address
+        })
 
-    //     new_station = await new_station.save()
-    //     if (!new_station) throw err
-    //     return res.status(200).send({
-    //         success: true,
-    //         msg: "Station added successfully!",
-    //         toPath: "/station_list",
-    //         station: new_station
-    //     })
-    // } catch (err) {
-    //     // // console.log(err) 
-    //     return res.status(400).send({
-    //         success: false,
-    //         msg: "There was an error!\nPlease try again later..."
-    //     })
-    // }
+        new_station = await new_station.save()
+        if (!new_station) throw err
+        return res.status(200).send({
+            success: true,
+            msg: "Station added successfully!",
+            toPath: "/station_list",
+            station: new_station
+        })
+    } catch (err) {
+        // // console.log(err) 
+        return res.status(400).send({
+            success: false,
+            msg: "There was an error!\nPlease try again later..."
+        })
+    }
 })
 
 router.get("/exp", async (req, res) => {
@@ -206,32 +211,39 @@ router.get("/exp", async (req, res) => {
 
 //----------------------For adding classes----------------------------------
 router.post("/add_class", async (req, res) => {
-    console.log(req.body) 
+    console.log(req.body)
 
     // try {
-    //     const { classType, fairRatio, totalSeats } = req.body
+    const { id, classType, fairRatio, totalSeats } = req.body
 
-    //     let result = await Class.findOne({ classType })
-    //     // console.log(result)
-    //     if (result) return res.send({
-    //         success: false,
-    //         msg: "This class already exists!  Please try with another name",
-    //         topath: "/add_class"
-    //     })
-    //     result = new Class({
-    //         classType,
-    //         fareRatio,
-    //         totalSeats
-    //     })
-    //     result = await result.save()
-    //     // console.log(result)
-    //     if (!result) throw err
-    //     return res.status(200).send({
-    //         success: true,
-    //         msg: "Class added successfully!",
-    //         toPath: "/class_list",
-    //         class: result
-    //     })
+    let result = await Class.findOne({ _id: id })
+    console.log(result)
+    if (result) {
+        result.classType = classType, result.fairRatio = fairRatio, result.totalSeats = totalSeats
+        result = await result.save()
+        console.log({ result })
+        if (!result) throw err
+        return res.status(200).send({
+            success: true,
+            msg: "Class Information Updated successfully!",
+            toPath: "/class_list",
+            class: result
+        })
+    }
+    result = new Class({
+        classType,
+        fairRatio,
+        totalSeats
+    })
+    result = await result.save()
+    // console.log(result)
+    if (!result) throw err
+    return res.status(200).send({
+        success: true,
+        msg: "Class added successfully!",
+        toPath: "/class_list",
+        class: result
+    })
     // } catch (err) {
     //     // console.log(err)
     //     return res.status(400).send({
@@ -246,15 +258,48 @@ router.post("/add_train", async (req, res) => {
     // console.log(req.body) 
 
     try {
-        const { name, number, classes, route, runningDays } = req.body
+        const { id, name, number, classes, route, runningDays } = req.body
         //calculation of departure time by adding stoppage time to arrival time at a particular station
-        let train = await Train.findOne({ number })
-        if (train) return res.status(400).send({ //in case if we have already a train with this number
-            success: false,
-            msg: `Train number already exists! Please try again with another train number.`,
-            toPath: "/add_train",
-            train
-        })
+        let train = await Train.findOne({ _id: id })
+        // console.log({train})
+        if (train) {
+            let run = []
+            for (let i = 0; i < runningDays.length; i++) run.push({ index: runningDays[i] })
+
+            for (let i = 0; i < route.length; i++) {
+                let hour = parseInt(route[i].arrivalTime.split(':')[0]),
+                    minute = parseInt(route[i].arrivalTime.split(':')[1])
+                hour = hour * 60 + minute + parseInt(route[i].stoppageTime)
+                minute = hour % 60, hour = Math.floor(hour / 60), hour = hour % 24
+                route[i].departureTime = (hour < 10 ? "0" + hour : hour) + ":" + (minute < 10 ? "0" + minute : minute)
+                // this is for adding on which day the train is running on a specific route 
+                if (i === 0) route[i].day = 0
+                else {
+                    let currTime = parseInt(route[i].arrivalTime.split(':')[0]),
+                        prevTime = parseInt(route[i - 1].arrivalTime.split(':')[0])
+                    console.log({ currTime }, { prevTime })
+                    if (prevTime > currTime) route[i].day = route[i - 1].day + 1
+                    else if (prevTime <= currTime) route[i].day = route[i - 1].day
+                }
+            }
+            for (let i = 0; i < classes.length; i++) classes[i].bookedSeats = 0
+
+            train.name = name
+            train.number = number
+            train.classes = classes
+            train.route = route
+            train.runningDays = run
+
+            train = await train.save()
+            if (!train) throw error
+
+            return res.status(200).send({
+                success: true,
+                msg: "Train Updated successfully!",
+                toPath: "/train_list",
+                train
+            })
+        }
 
         let run = []
         for (let i = 0; i < runningDays.length; i++) run.push({ index: runningDays[i] })
@@ -285,14 +330,14 @@ router.post("/add_train", async (req, res) => {
         train = await train.save()
         console.log(train)
 
-        //  if(!train) throw error 
+        if (!train) throw error
 
-        //  return res.status(200).send({
-        //      success:true,
-        //      msg:"Train added successfully!",
-        //      toPath:"/train_list",
-        //      train
-        //  })
+        return res.status(200).send({
+            success: true,
+            msg: "Train added successfully!",
+            toPath: "/train_list",
+            train
+        })
     } catch (error) {
         // console.log("There was an error! Please try again later.")
         console.log(error)
@@ -302,6 +347,45 @@ router.post("/add_train", async (req, res) => {
         })
     }
 
+})
+
+router.post('/delete_class', async (req, res) => {
+    const { id } = req.body
+    let classItem = await Class.deleteOne({ _id: id })
+    if (!classItem) return res.status(500).send({
+        success: false,
+        msg: 'There was an error!  Please try again later.'
+    })
+    return res.status(200).send({
+        success: true,
+        msg: 'Class deleted successfully.'
+    })
+})
+
+router.post('/delete_station', async (req, res) => {
+    const { id } = req.body
+    let station = await Station.deleteOne({ _id: id })
+    if (!station) return res.status(500).send({
+        success: false,
+        msg: 'There was an error! Please try again later.'
+    })
+    return res.status(200).send({
+        success: true,
+        msg: 'Station Deleted successfully.'
+    })
+})
+
+router.post('/delete_train', async (req, res) => {
+    const { id } = req.body
+    let station = await Train.deleteOne({ _id: id })
+    if (!station) return res.status(500).send({
+        success: false,
+        msg: 'There was an error! Please try again later.'
+    })
+    return res.status(200).send({
+        success: true,
+        msg: 'Train Deleted successfully.'
+    })
 })
 
 
@@ -452,8 +536,6 @@ router.post("/update_train", async (req, res) => {
     }
 
 })
-
-
 
 router.get("/refresh_trains", async (req, res) => {
     try {
@@ -649,6 +731,7 @@ router.post('/verify_otp', auth, async (req, res) => {
 
 })
 
+
 router.post('/cancel_ticket', async (req, res) => {
 
     const { pnr } = req.body
@@ -659,71 +742,77 @@ router.post('/cancel_ticket', async (req, res) => {
 
     let ticket = await Ticket.findOne({ pnr }),
         pnr_value = await Pnr.findOne({ pnr })
+
     if (!ticket || !pnr_value) return res.status(400).send({
         success: false,
         msg: 'No such ticket exists! Please enter valid PNR.'
     })
 
-    let train = await Train.findOne({ number: ticket.train.number }),
-        user = await User.findOne({ _id: ticket.bookedBy })
-    if (!train || !user) return res.status(400).send({
-        success: false,
-        msg: 'There was an error! Please try again later.'
-    })
+    console.log({ ticket }, { pnr_value })
 
-    // now we delete the pnr from list of pnrs first 
-    pnr_value = await Pnr.deleteOne({ pnr })
-    if (!pnr_value) return res.status(400).send({
-        success: false,
-        msg: 'There was an error during cancellation! Please try again later.'
-    })
+    if (ticket && pnr_value) {
+        let train = await Train.findOne({ number: ticket.train.number }),
+            ticket_value = ticket,
+            user = await User.findOne({ _id: ticket.bookedBy })
+        if (!train || !user) return res.status(400).send({
+            success: false,
+            msg: 'There was an error! Please try again later.'
+        })
+        // console.log({user} , {train})
 
-    // we have successfully deleted the pnr from list of pnrs 
-    // we need to delete the ticket  now 
-    ticket = await Ticket.deleteOne({ pnr })
-    if (!ticket) return res.status(400).send({
-        success: false,
-        msg: 'There was an error during cancellation! Please try again later.'
-    })
+        // now we delete the pnr from list of pnrs first 
+        pnr_value = await Pnr.deleteOne({ pnr })
+        if (!pnr_value) return res.status(400).send({
+            success: false,
+            msg: 'There was an error during cancellation! Please try again later.'
+        })
 
-    // so far we have deleted ticket and pnr , now we need to change status of the train
-    for (let i = 0; i < train.classes.length; i++) {
-        if (train.classes[i].classType === ticket.jClass.classType) {
-            train.classes[i].seats[ticket.seat] = false
-            break;
-        } else continue
-    }
-    train = await train.save()
-    if (!train) return res.status(400).send({
-        success: false,
-        msg: 'Your ticket was cancelled successfully! See you again.'
-    })
-    // now only change left is to update user reservations 
-    let found = false
-    for (let i = 0; i < user.reservations.length; i++) {
-        if (user.reservations[i][0].createdAt === ticket.createdAt) {
-            // we have found a match for our ticket
-            for (let j = 0; i < user.reservations[i].length; j++) {
-                if (user.reservations[i][j].pnr === ticket.pnr) {
-                    user.reservations[i][j].status = 'Cancelled'
-                    found = true
+        // we have successfully deleted the pnr from list of pnrs 
+        // we need to delete the ticket  now 
+        ticket = await Ticket.deleteOne({ pnr })
+        if (!ticket) return res.status(400).send({
+            success: false,
+            msg: 'There was an error during cancellation! Please try again later.'
+        })
+
+        // so far we have deleted ticket and pnr , now we need to change status of the train
+        for (let i = 0; i < train.classes.length; i++) {
+            if (train.classes[i].classType === ticket_value.jClass.classType) {
+                train.classes[i].seats[ticket.seat] = false
+                console.log(train.classes[i])
+                break;
+            } else continue
+        }
+
+        train = await train.save()
+        if (!train) return res.status(400).send({
+            success: false,
+            msg: 'Your ticket was cancelled successfully! See you again.'
+        })
+
+        // now only change left is to update user reservations
+            // console.log({pnr})
+        for(let i=0;i<user.reservations.length;i++){
+            for(let j=0;j<user.reservations[i].length;j++){
+                if(user.reservations[i][j].pnr === pnr){
+                let time = `${present.day.index}-${present.month.name}-${present.year} ${present.time.hour}:${present.time.minute}`
+                user.reservations[i][j].status = `Cancelled on ${time}`
+                console.log(user.reservations[i][j].status)
                     break;
                 }
             }
         }
-        if (found) break
+        user = await user.save() 
+        if(!user) return res.status(500).send({
+            success:false ,
+            msg:'Your ticket was cancelled successfully'
+        })
+
+        return res.status(200).send({
+            msg: 'Ticket cancellation successful! ',
+            success: true,
+        })
     }
-    user = await user.save()
-    if (!user) return status(200).send({
-        success: false,
-        msg: 'Your ticket was cancelled successfully! See you soon'
-    })
-
-    return res.status(200).send({
-        msg: 'Ticket cancellation successful! ',
-        success: true,
-    })
-
 
 
     // } catch (error) {

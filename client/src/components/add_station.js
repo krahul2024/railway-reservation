@@ -1,11 +1,13 @@
 import React , {useState , useEffect } from 'react'
-import {NavLink , useNavigate } from 'react-router-dom'
+import {NavLink , useNavigate , useLocation } from 'react-router-dom'
 
 const AddStation = () => {
 	const navigate = useNavigate()
-	const [name , setName] = useState('')
-	const [code , setCode] = useState('')
-	const [address , setAddress] = useState('') 
+	const location = useLocation()
+	const station = location?.state?.station  
+	const [name , setName] = useState(station?.name||'')
+	const [code , setCode] = useState(station?.code||'')
+	const [address , setAddress] = useState(station?.address||'') 
 
 	const addClass = async(e) => {
 				e.preventDefault() 
@@ -18,7 +20,7 @@ const AddStation = () => {
 					"Content-Type":"application/json"
 				},
 				body:JSON.stringify({
-					name , code , address
+					id:station?._id,name , code , address
 				})
 			})
 
@@ -26,7 +28,8 @@ const AddStation = () => {
 
 			console.log(result) 
 			if(!result.success) throw new Error(result.msg)
-			alert('Class added successfully')
+			alert(result.msg)
+			navigate('/info')
 
 		}
 		catch(error) {
@@ -77,8 +80,8 @@ const AddStation = () => {
 				<div className="flex items-start mt-5 gap-4 items-center justify-center">
 					<button onClick = { (e) => addClass(e)}
 						className="flex items-center cursor-pointer px-16 py-1.5 border border-sky-900 hover:border-transparent hover:bg-blue-800 hover:text-gray-900 font-semibold text-sky-700 rounded-full w-fit"
-						>Add</button>
-					<NavLink to="/"
+						>{station?'Update':'Add'}</button>
+					<NavLink to="/info"
 						className="flex items-center cursor-pointer px-16 py-1.5 border border-sky-900 hover:border-transparent hover:bg-blue-800 hover:text-gray-900 font-semibold text-sky-700 rounded-full w-fit"
 						>Cancel</NavLink>
 				</div>

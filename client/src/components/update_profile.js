@@ -20,30 +20,34 @@ const UpdateProfile = () => {
 	const processProfileUpdateData = async(e) => {
 		e.preventDefault() 
 		console.log('Name:',name,'\nUsername:',username, "\nPassword:",password)
-
-		try{
-			const response = await fetch("http://localhost:4000/user/update_user" , {
-			method:"POST",
-			headers:{
-				"Content-Type":"application/json"
-			},
-			body:JSON.stringify({
-				username , name , phone , address , email 
+		const correct = email.includes('@')
+		if(!correct) alert('Invalid email format.')
+		else {
+			try{
+				const response = await fetch("http://localhost:4000/user/update_user" , {
+				method:"POST",
+				headers:{
+					"Content-Type":"application/json"
+				},
+				body:JSON.stringify({
+					username , name , phone , address , email 
+					})
 				})
-			})
 
-			const data = await response.json() 
+				const data = await response.json() 
 
-			if(!data.success) throw new Error(data.msg)
+				if(!data.success) throw new Error(data.msg)
 
-			window.alert(data.msg) 
-			navigate("/user/profile")
+				window.alert(data.msg) 
+				navigate("/user/profile")
+			}
+			catch(error) {
+				console.log(error.message) 
+				if(error.message)window.alert(error.message)  
+				else window.alert("There was an error logging you in! Please try again later. Thanks.")
+			}
 		}
-		catch(error) {
-			console.log(error.message) 
-			if(error.message)window.alert(error.message)  
-			else window.alert("There was an error logging you in! Please try again later. Thanks.")
-		}
+		 
 		
 
 	}
@@ -89,14 +93,14 @@ const UpdateProfile = () => {
 
 							<div className="flex flex-col p-2">
 								<span className="text-cyan-500 font-semibold px-1 py-1 -ml-2">E-mail</span>
-								<input type="text" value={email} onChange = { (e) => setEmail(e.target.value)}
+								<input type="email" value={email} onChange = { (e) => setEmail(e.target.value)}
 									className="outline-0 bg-transparent px-2 border-b-2 border-cyan-700 text-indigo-500 hover:border-indigo-600 hover:brightness-150 shadow-2xl"
 									/>
 							</div>
 
 							<div className="flex flex-col p-2">
 								<span className="text-cyan-500 font-semibold px-1 py-1 -ml-2">Address</span>
-								<input type="text" value={address} onChange = { (e) => setAddress(e.target.value)}
+								<textarea type="text" value={address} onChange = { (e) => setAddress(e.target.value)}
 									className="outline-0 bg-transparent px-2 border-b-2 border-cyan-700 text-indigo-500 hover:border-indigo-600 hover:brightness-150 shadow-2xl"
 									/>
 							</div>

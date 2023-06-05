@@ -17,6 +17,10 @@ const Register = () => {
 		e.preventDefault() 
 		console.log(user) 
 
+		if(user.name.length === 0) alert('Please provide a real name.')
+		if(user.username.length === 0) alert('Username should be of length greater than 0')
+		if(user.password.length<=4) alert('Password length should be more than 4 characters.')
+
 		try{
 
 			const response = await fetch("http://localhost:4000/user/register" , {

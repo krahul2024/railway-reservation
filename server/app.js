@@ -4,7 +4,6 @@ import mongoose from 'mongoose'
 import User from './models/user.js'
 import trainRouter from './routes/train.js'
 import userRouter from './routes/user.js'
-import payRouter from './routes/exp.js'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 
@@ -37,7 +36,6 @@ app.get("/",(req,res) => {
 
 app.use('/train' , trainRouter)
 app.use('/user' , userRouter) 
-app.use('/pay',payRouter)
 
 
 app.listen(PORT, () => console.log(`Server is running on the PORT: ${PORT}`))

@@ -23,7 +23,8 @@ const PnrStatus = () => {
 				})
 			})
 		const result = await response.json()  
-		// console.log(result) 
+		console.log(result) 
+		if(!result.success) alert(result.msg) 
 		if(result.success) setStatus(result) 
 		setSuccess(result.success)
 	}
@@ -36,19 +37,23 @@ const PnrStatus = () => {
 		e.preventDefault() 
 		console.log({pnr})
 
-		const response = await fetch("http://localhost:4000/train/cancel_ticket",{
-				method:"POST",
-				credentials:"include",
-				headers:{
-					"Content-Type":"application/json"
-				},
-				body:JSON.stringify({
-					pnr
+		if(window.confirm('Are you sure to cancel the ticket?')){
+			const response = await fetch("http://localhost:4000/train/cancel_ticket",{
+					method:"POST",
+					credentials:"include",
+					headers:{
+						"Content-Type":"application/json"
+					},
+					body:JSON.stringify({
+						pnr
+					})
 				})
-			})
-		const result = await response.json() 
-		console.log({result})
-
+			const result = await response.json() 
+			alert(result.msg) 
+			window.location.reload()
+			console.log({result})
+		}
+		else alert('Your ticket will not be cancelled.')	
 	}
 
 	return (<> 
@@ -79,7 +84,7 @@ const PnrStatus = () => {
 					<div className="flex p-2 gap-2">
 						<span className="px-4 py-1 mt-8 flex justify-items-center text-green-500 ">Seat Status : {status.seat_status} </span>
 						<button onClick = { (e) => cancelTicket(e) }
-							className="px-4 py-1 mt-8 text-red-500 text-md font-semibold border-red-600 border-2 rounded-lg flex text-center hover:bg-orange-700 hover:border-transparent hover:text-black"
+							className="px-4 py-1 mt-8 text-red-500 text-md font-semibold border-red-600 border-2 rounded-lg flex text-center hover:bg-red-600 hover:border-transparent hover:text-black"
 							>Cancel Ticket</button>
 					</div>
 					<span className="px-4 py-1 flex justify-items-center text-green-500 ">Seat No. : {status.seat} </span>

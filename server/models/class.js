@@ -3,10 +3,9 @@ import mongoose from 'mongoose'
 const classSchema = new mongoose.Schema({
 	classType:{
 		type:String,
-		required:true,
-		unique:true
+		required:true
 	},
-	fareRatio:{
+	fairRatio:{
 		type:Number,
 		required:true,
 	default:1
