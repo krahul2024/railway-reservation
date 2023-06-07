@@ -27,9 +27,46 @@ const TrainList  = (props) => {
 		index:7,name:"All Days",short:"All"
 	}]
 	
-	// console.log(location.state) 
-	const trainsList  = location.state.trains
-	// console.log({trainsList})
+	const present = {
+	    time: {
+	        hour: Date().split(' ')[4].split(':')[0],
+	        minute: Date().split(' ')[4].split(':')[1]
+	    },
+	    day: {
+	        index: new Date().getDate(),
+	        weekday: Date().split(' ')[0]
+	    },
+	    month: {
+	        index: new Date().getMonth(),
+	        name: Date().split(' ')[1]
+	    },
+	    year: Date().split(' ')[3]
+	}
+	let addFactor = 0 
+
+	for(let i=0;i<weekdays.length;i++){
+		if(present.day.weekday === weekdays[i].short) {
+			addFactor = weekdays[i].index
+			break
+		}
+	}
+
+	const trainsList  = location?.state?.trains
+	const sDate = location?.state?.dt?.date?.day || 0 
+	let diff = 0 
+	if(sDate) diff = sDate - present.day.index 
+
+	for(let i=0;i<trainsList.length;i++){
+		for(let j=0;j<trainsList[i].runningDays.length;j++){
+			let temp_value = trainsList[i].runningDays[j]  
+			temp_value.date = temp_value.index + present.day.index - addFactor
+			temp_value.date += (Math.floor(diff/7)*7)
+			if(temp_value.date < sDate || temp_value.date < present.day.index) temp_value.date+=7  
+		}
+		trainsList[i].runningDays.sort((a,b) => a.date-b.date >=0 ? 1 : -1)
+	}
+	
+	console.log({trainsList})
 	const stations = location.state.station
 	console.log(stations)
 
@@ -95,9 +132,6 @@ const TrainList  = (props) => {
 		!order && trainsList.sort((a,b) => b.bTime - a.bTime) 
 	}
 
-	
-	for(let i=0;i<trainsList.length;i++)
-		console.log(trainsList[i].aTime, trainsList[i].bTime,trainsList[i].jTime)
 
 	// console.log({trainsList})
 
@@ -165,8 +199,12 @@ const TrainList  = (props) => {
 								<div className="mt-2 mb-3">
 									{train.runningDays.map((days , dayIndex) => 
 										<span key={dayIndex} 
-											className={`px-2 py-1 border-2 border-cyan-700 ${dayIndex==0?'rounded-md':'border-l-transparent rounded-md'} text-sky-600  brightness-125 `}
-											>{weekdays[days.index].short}</span>
+											className={`px-2 py-2.5 border-2 border-cyan-700 ${dayIndex==0?'rounded-md':'border-l-transparent rounded-md'} text-sky-600  brightness-125 `}
+											>
+												<span className="px-1">{days.date}</span>
+												<span className="text-lg">{weekdays[days.index].short}</span>
+												
+											</span>
 										)}
 								</div>
 							</div>

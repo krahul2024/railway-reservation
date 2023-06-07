@@ -241,6 +241,7 @@ const Home = () => {
 			state:{
 				trains:data.trains,
 				station:data.station,
+				dt:dateInfo
 			}
 		})
 		}
