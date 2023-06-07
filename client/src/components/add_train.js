@@ -240,8 +240,8 @@ const AddTrain = () => {
 			<form method="post" className="p-2 rounded-lg">
 {/*-------------------------This section contains headings and a subheading --------------------------------------*/}
 				<div className="flex flex-col items-center rounded-lg">
-					<h1 className="text-sky-600 text-3xl font-bold">Add A Train</h1>
-					<span className="text-cyan-500 flex italic text-center">Enter following information about the train you want to add</span>
+					<h1 className="text-sky-600 text-3xl font-bold">{train_details?`Update ${train_details?.name}`:'Add A Train'}</h1>
+					<span className="text-cyan-500 flex italic text-center">Enter following information about the train you want to {train_details?'update':'add'}</span>
 				</div>
 
 {/*---------------------------This section contains basic information about the train----------------------------*/}

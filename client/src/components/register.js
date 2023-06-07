@@ -21,29 +21,32 @@ const Register = () => {
 		if(user.username.length === 0) alert('Username should be of length greater than 0')
 		if(user.password.length<=4) alert('Password length should be more than 4 characters.')
 
-		try{
+		else {
+			try{
 
-			const response = await fetch("http://localhost:4000/user/register" , {
-				method:"POST",
-				headers:{
-					"Content-Type":"application/json"
-				},
-				body:JSON.stringify({
-					name:user.name ,
-					username:user.username ,
-					password:user.password 
+				const response = await fetch("http://localhost:4000/user/register" , {
+					method:"POST",
+					headers:{
+						"Content-Type":"application/json"
+					},
+					body:JSON.stringify({
+						name:user.name ,
+						username:user.username ,
+						password:user.password 
+					})
 				})
-			})
 
-			const result = await response.json() 
-			window.alert(result.msg)
-			console.log(result) 
+				const result = await response.json() 
+				window.alert(result.msg)
+				console.log(result) 
+			}
+			catch(error) {
+				console.log(error) 
+				if(error.message)window.alert(error.message) 
+				else window.alert("There was an error registering you! Please try again later.")
+			}
 		}
-		catch(error) {
-			console.log(error) 
-			if(error.message)window.alert(error.message) 
-			else window.alert("There was an error registering you! Please try again later.")
-		}
+		
 	}
 
 	let [showPass , setShowPass] = useState("password")

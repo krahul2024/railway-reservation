@@ -208,11 +208,11 @@ const ReservationConfirmation = () => {
 		</div>
 		<div className="flex flex-col items-center px-4 py-6 gap-y-4">
 			<span className="text-cyan-500 font-semibold text-lg p-4">List of all the passengers</span>
-			<div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-x-6 gap-y-10 flex justify-center">
+			<div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-x-6 gap-y-10 flex items-center">
 				{passes.length>0 && passes.map((user , index) => (
-					<div className="">
+					<div className="flex items-center justify-center">
 					{ (!edit || idx!==index) && (
-						<div className="flex text-start flex-col border-cyan-900 border rounded-lg px-6 py-3 gap-y-4 bg-transparent text-blue-500 brightness-125">
+						<div className="flex text-start  flex-col border-cyan-900 border rounded-lg px-6 py-3 gap-y-4 bg-transparent text-blue-500 brightness-125">
 							<span className="mb-2">Person {index+1}</span>
 							<span className="mt-6 bg-transparent px-4 py-1.5 ">{user.name}</span>
 							<span className="bg-transparent px-4 py-1.5">{user.email}</span>

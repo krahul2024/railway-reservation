@@ -1,11 +1,13 @@
-import React , { useState } from 'react' 
+import React , { useState  , useContext} from 'react' 
 import { NavLink , useLocation , useNavigate } from 'react-router-dom'
+import {UserContext} from '../userContext.js'
 
 
 const UpdateProfile = () => {
 
 	const navigate = useNavigate() 
 	const location = useLocation() 
+	const {profile , setProfile} = useContext(UserContext)
 
 	console.log(location.state)
 	const user = location.state.user 
@@ -38,7 +40,9 @@ const UpdateProfile = () => {
 
 				if(!data.success) throw new Error(data.msg)
 
+				// console.log({data})
 				window.alert(data.msg) 
+				setProfile(data.user) 
 				navigate("/user/profile")
 			}
 			catch(error) {

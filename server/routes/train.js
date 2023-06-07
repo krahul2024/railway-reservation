@@ -147,13 +147,15 @@ router.get("/train_list", async (req, res) => {
     }
 })
 
-// router.get("/exp" , async(req,res) => {
-//  let trains = await Train.find({})  
-//  for(let i=0;i<trains.length;i++){
-//      trains[i].runningDays.sort((a,b) => a.index > b.index ? 1: -1)
-//      await trains[i].save()
-//  }
-// })
+router.get("/exp" , async(req,res) => {
+ let trains = await Train.find({})  
+ for(let i=0;i<trains.length;i++){
+    for(let j=0;j<trains[i].classes.length;j++){
+        trains[i].classes[j].fareRatio = 0.7 * (4 - j)
+    }
+    await trains[i].save() 
+ }
+})
 
 
 

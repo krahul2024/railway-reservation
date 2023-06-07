@@ -45,9 +45,9 @@ const AddStation = () => {
 			<div className="flex flex-col px-12 py-6 bg-slate-900 rounded-lg shadow-xl shadow-slate-900 brightness-125">
 				<div className="flex flex-col items-center text-center py-12 px-4">
 					<div className="p-1 text-lg font-semibold text-sky-500 ">
-						Add Station
+						{station?'Update Station':'Add Station'}
 					</div>
-					<span className="text-indigo-600 italic">Enter station information you want to add</span>
+					<span className="text-indigo-600 italic">Enter station information you want to {station?'update':'add'}</span>
 				</div>
 				
 				<label className="flex flex-col px-12 py-6">

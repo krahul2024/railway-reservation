@@ -56,12 +56,16 @@ const TrainList  = (props) => {
 	let diff = 0 
 	if(sDate) diff = sDate - present.day.index 
 
+	console.log({sDate})
 	for(let i=0;i<trainsList.length;i++){
 		for(let j=0;j<trainsList[i].runningDays.length;j++){
 			let temp_value = trainsList[i].runningDays[j]  
+			temp_value.date = 0 
 			temp_value.date = temp_value.index + present.day.index - addFactor
 			temp_value.date += (Math.floor(diff/7)*7)
-			if(temp_value.date < sDate || temp_value.date < present.day.index) temp_value.date+=7  
+			if(temp_value.date < sDate || temp_value.date < present.day.index) temp_value.date+=7 
+			// temp_value.date = temp_value.date % 31 + 1   
+			trainsList[i].runningDays[j] = temp_value
 		}
 		trainsList[i].runningDays.sort((a,b) => a.date-b.date >=0 ? 1 : -1)
 	}
