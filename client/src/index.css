@@ -1,0 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* > *{
+  font-family: 'Source Code Pro', monospace;
+}
+
+body{
+  background-image: url("./images/background.jpg");
+  @apply text-gray-200;
+}
+
